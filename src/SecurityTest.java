@@ -2,6 +2,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.*;
 import java.security.spec.RSAKeyGenParameterSpec;
@@ -31,23 +32,24 @@ public class SecurityTest {
         return signature.verify(encSignature);
     }
 
-    public static byte[] ecbEncrypt(SecretKey key, byte[] data)
+    public static byte[][] cbcEncrypt(SecretKey key, byte[] data)
             throws GeneralSecurityException
     {
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS1Padding", "BC");
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding", "BC");
         cipher.init(Cipher.ENCRYPT_MODE, key);
-        return cipher.doFinal(data);
-    }
-    public static byte[] ecbDecrypt(SecretKey key, byte[] cipherText)
+        return new byte[][] { cipher.getIV(), cipher.doFinal(data) };}
+
+    public static byte[] cbcDecrypt(SecretKey key, byte[] iv, byte[] cipherText)
             throws GeneralSecurityException
     {
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS1Padding", "BC");
-        cipher.init(Cipher.DECRYPT_MODE, key);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding", "BC");
+        cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
         return cipher.doFinal(cipherText);
     }
 
     public static SecretKey defineKey(byte[] keyBytes)
     {
+        System.out.println("Length - " + keyBytes.length);
         if (keyBytes.length != 16 && keyBytes.length != 24 && keyBytes.length != 32)
         {
             throw new IllegalArgumentException("keyBytes wrong length for AES key");
@@ -99,7 +101,7 @@ public class SecurityTest {
             System.out.println("Bob's unencrypted message - " + Arrays.toString(bobMsg));
 
             // Encrypt Bob's message with Anne's public key.
-            byte[] bobEncryptedMsg = ecbEncrypt(defineKey(anneKeys.getPublic().getEncoded()), bobMsg);
+            byte[] bobEncryptedMsg = cbcEncrypt(defineKey(anneKeys.getPublic().getEncoded()), bobMsg);
             System.out.println("Bob's encrypted message - " + Arrays.toString(bobEncryptedMsg));
         } catch (GeneralSecurityException e) {
             System.out.println(e);
