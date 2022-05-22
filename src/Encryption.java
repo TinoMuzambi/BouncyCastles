@@ -1,11 +1,23 @@
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.GeneralSecurityException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.Security;
+import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.Arrays;
 
 public class Encryption {
+    public static KeyPair generateKeyPair() throws GeneralSecurityException {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", "BC");
+        keyPairGenerator.initialize(new RSAKeyGenParameterSpec(20, RSAKeyGenParameterSpec.F4));
+        return keyPairGenerator.generateKeyPair();
+    }
+
     public static byte[][] cbcEncrypt(SecretKey key, byte[] data)
             throws GeneralSecurityException
     {
@@ -23,7 +35,6 @@ public class Encryption {
 
     public static SecretKey defineKey(byte[] keyBytes)
     {
-        System.out.println("Length - " + keyBytes.length);
         if (keyBytes.length != 16 && keyBytes.length != 24 && keyBytes.length != 32)
         {
             throw new IllegalArgumentException("keyBytes wrong length for AES key");
@@ -32,7 +43,23 @@ public class Encryption {
     }
 
     public static void main(String[] args) {
+        // Add BouncyCastleProvider.
+        Security.addProvider(new BouncyCastleProvider());
+
+        // Initialise sender/receiver keys.
+        KeyPair anneKeys;
+        KeyPair bobKeys;
+
         try {
+            // Generation of sender/receiver public and private keys.
+            anneKeys = generateKeyPair();
+            System.out.println("Anne's public key - " + anneKeys.getPublic());
+            System.out.println("Anne's private key - " + anneKeys.getPrivate());
+
+            bobKeys = generateKeyPair();
+            System.out.println("Bob's public key - " + bobKeys.getPublic());
+            System.out.println("Bob's private key - " + bobKeys.getPrivate());
+
             // The below represents encryption. This provides us with message authentication.
             // Generate Bob's message.
             byte[] bobMsg = new byte[4];
@@ -44,7 +71,7 @@ public class Encryption {
 
             // Encrypt Bob's message with Anne's public key.
             byte[][] bobEncryptedMsg = cbcEncrypt(defineKey(anneKeys.getPublic().getEncoded()), bobMsg);
-            System.out.println("Bob's encrypted message - " + Arrays.toString(bobEncryptedMsg));
+            System.out.println("Bob's encrypted message - " + Arrays.toString(bobEncryptedMsg[0]) + Arrays.toString(bobEncryptedMsg[1]));
         } catch (GeneralSecurityException e) {
             System.out.println(e);
         }
