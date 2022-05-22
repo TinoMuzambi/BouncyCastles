@@ -11,19 +11,27 @@ public class Hashing {
         return keyPairGenerator.generateKeyPair();
     }
 
-    public static byte[] generateX931Signature(PrivateKey rsaPrivate, byte[] input)
-            throws GeneralSecurityException {
-        Signature signature = Signature.getInstance("SHA384withRSA/X9.31", "BC");
+    public static byte[] generatePkcs1Signature(PrivateKey rsaPrivate, byte[] input)
+            throws GeneralSecurityException
+    {
+        Signature signature = Signature.getInstance("SHA384withRSA", "BCFIPS");
+
         signature.initSign(rsaPrivate);
+
         signature.update(input);
+
         return signature.sign();
     }
 
-    public static boolean verifyX931Signature(PublicKey rsaPublic, byte[] input, byte[] encSignature)
-            throws GeneralSecurityException {
-        Signature signature = Signature.getInstance("SHA384withRSA/X9.31", "BC");
+    public static boolean verifyPkcs1Signature(PublicKey rsaPublic, byte[] input, byte[] encSignature)
+            throws GeneralSecurityException
+    {
+        Signature signature = Signature.getInstance("SHA384withRSA", "BCFIPS");
+
         signature.initVerify(rsaPublic);
+
         signature.update(input);
+
         return signature.verify(encSignature);
     }
 
@@ -54,11 +62,11 @@ public class Hashing {
         System.out.println("Anne's unsigned message - " + Arrays.toString(anneMsg));
 
         // Sign Anne's message with Anne's private key.
-        byte[] anneSignedMsg = generateX931Signature(anneKeys.getPrivate(), anneMsg);
+        byte[] anneSignedMsg = generatePkcs1Signature(anneKeys.getPrivate(), anneMsg);
         System.out.println("Anne's signed message - " + Arrays.toString(anneSignedMsg));
 
         // Verify Anne's message with Anne's public key.
-        boolean bobReceivesAnneMsg = verifyX931Signature(anneKeys.getPublic(), anneMsg, anneSignedMsg);
+        boolean bobReceivesAnneMsg = verifyPkcs1Signature(anneKeys.getPublic(), anneMsg, anneSignedMsg);
         System.out.println("Bob successfully verified Anne's message - " + bobReceivesAnneMsg);
 
     }
