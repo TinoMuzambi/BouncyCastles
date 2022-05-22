@@ -101,7 +101,7 @@ public class SecurityTest {
             System.out.println("Bob's unencrypted message - " + Arrays.toString(bobMsg));
 
             // Encrypt Bob's message with Anne's public key.
-            byte[] bobEncryptedMsg = cbcEncrypt(defineKey(anneKeys.getPublic().getEncoded()), bobMsg);
+            byte[][] bobEncryptedMsg = cbcEncrypt(defineKey(anneKeys.getPublic().getEncoded()), bobMsg);
             System.out.println("Bob's encrypted message - " + Arrays.toString(bobEncryptedMsg));
         } catch (GeneralSecurityException e) {
             System.out.println(e);
