@@ -12,6 +12,11 @@ import java.security.Security;
 import java.util.Arrays;
 
 public class Encryption {
+    /**
+     * Generates a key using AES with 256 key size.
+     * @return An AES key with 256 key size.
+     * @throws GeneralSecurityException in case of security errors.
+     */
     public static SecretKey generateKey()
             throws GeneralSecurityException
     {
@@ -20,6 +25,13 @@ public class Encryption {
         return keyGenerator.generateKey();
     }
 
+    /**
+     * Encrypts a byte array using Cipher Block Chaining mode.
+     * @param key The key to be used for the encryption.
+     * @param data The data you want to encrypt.
+     * @return A 2D array with the first element being the IV and the second the encrypted data.
+     * @throws GeneralSecurityException in case of security errors.
+     */
     public static byte[][] cbcEncrypt(SecretKey key, byte[] data)
             throws GeneralSecurityException {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC");
@@ -27,6 +39,14 @@ public class Encryption {
         return new byte[][]{cipher.getIV(), cipher.doFinal(data)};
     }
 
+    /**
+     * Decrypts a byte array using Cipher Block Chaining mode.
+     * @param key The key to be used for the decryption.
+     * @param iv The initialisation vector to be used.
+     * @param cipherText The data you want to decrypt.
+     * @return A byte array containing the decrypted data.
+     * @throws GeneralSecurityException in case of security errors.
+     */
     public static byte[] cbcDecrypt(SecretKey key, byte[] iv, byte[] cipherText)
             throws GeneralSecurityException {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC");
@@ -34,6 +54,11 @@ public class Encryption {
         return cipher.doFinal(cipherText);
     }
 
+    /**
+     * COnverts a key's bytes to a SecurityKey.
+     * @param keyBytes The encoded key you want to convert.
+     * @return A SecretKey from the encoded key provided.
+     */
     public static SecretKey defineKey(byte[] keyBytes) {
         if (keyBytes.length != 16 && keyBytes.length != 24 && keyBytes.length != 32) {
             throw new IllegalArgumentException("keyBytes wrong length for AES key");
@@ -42,7 +67,7 @@ public class Encryption {
     }
 
     /**
-     * Install BC Fips provider.
+     * Install Bouncy Castle provider.
      */
     public static void installProvider()
     {
@@ -52,7 +77,7 @@ public class Encryption {
     public static void main(String[] args) throws GeneralSecurityException {
         installProvider();
 
-        // Initialise and generation of key.
+        // Initialise and generate a key.
         defineKey(new byte[128 / 8]);
         defineKey(new byte[192 / 8]);
         defineKey(new byte[256 / 8]);
