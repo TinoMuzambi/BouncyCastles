@@ -6,12 +6,24 @@ import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.Arrays;
 
 public class Hashing {
+    /**
+     * Generates a private/public key pair using RSA and a key size of 3072.
+     * @return A private/public key pair.
+     * @throws GeneralSecurityException in case of security errors.
+     */
     public static KeyPair generateKeyPair() throws GeneralSecurityException {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", "BC");
         keyPairGenerator.initialize(new RSAKeyGenParameterSpec(3072, RSAKeyGenParameterSpec.F4));
         return keyPairGenerator.generateKeyPair();
     }
 
+    /**
+     * Generate a signature using the PKCS#1.5 Signature Format.
+     * @param rsaPrivate The private key to sign with.
+     * @param input The data you want to sign.
+     * @return A byte array containing the signed data.
+     * @throws GeneralSecurityException in case of security errors.
+     */
     public static byte[] generatePkcs1Signature(PrivateKey rsaPrivate, byte[] input)
             throws GeneralSecurityException
     {
@@ -24,6 +36,13 @@ public class Hashing {
         return signature.sign();
     }
 
+    /**
+     * Verify a signature using the PKCS#1.5 Signature Format.
+     * @param rsaPublic The public key to verify with.
+     * @param input The data you want to verify.
+     * @return True if the data is valid, false otherwise.
+     * @throws GeneralSecurityException in case of security errors.
+     */
     public static boolean verifyPkcs1Signature(PublicKey rsaPublic, byte[] input, byte[] encSignature)
             throws GeneralSecurityException
     {
@@ -36,6 +55,9 @@ public class Hashing {
         return signature.verify(encSignature);
     }
 
+    /**
+     * Install Bouncy Castle provider.
+     */
     public static void installProvider()
     {
         Security.addProvider(new BouncyCastleProvider());
