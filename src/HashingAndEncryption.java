@@ -5,6 +5,7 @@ import org.bouncycastle.util.Strings;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Arrays;
 
@@ -62,7 +63,9 @@ public class HashingAndEncryption {
         System.out.println("1.2) Server's private key - " + serverKeys.getPrivate());
 
         // Generate Anne's message.
-        byte[] anneMsg = Strings.toByteArray("Houston, we are hidden.");
+        String originalMessage = "Houston, we are hidden.";
+        System.out.println("Original message - " + originalMessage);
+        byte[] anneMsg = Strings.toByteArray(originalMessage);
         System.out.println("Anne's unsigned message - " + Arrays.toString(anneMsg));
 
         // 3. Compress Anne's message.
@@ -142,5 +145,7 @@ public class HashingAndEncryption {
         // 15./17. Verify Anne's message with Anne's public key.
         boolean bobReceivesAnneMsg = Hashing.verifyPkcs1Signature(anneKeys.getPublic(), anneComparisonHash, anneSignedMsgDecrypted);
         System.out.println("15/17) Bob successfully verified Anne's message - " + bobReceivesAnneMsg);
+
+        System.out.println("Original message - " + new String(anneMsgDecrypted, StandardCharsets.UTF_8));
     }
 }
