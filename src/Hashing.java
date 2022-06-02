@@ -89,6 +89,12 @@ public class Hashing {
             return out.toByteArray();
     }
 
+    /**
+     * Deompresses data using ZIP.
+     * @param data The data you want to decompress.
+     * @return The decompressed data.
+     * @throws IOException In case of errors in compression.
+     */
     public static byte[] decompressData(byte[] data) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         InflaterOutputStream infl = new InflaterOutputStream(out);
@@ -124,20 +130,34 @@ public class Hashing {
         byte[] anneMsg = Strings.toByteArray("Houston, we are hidden.");
         System.out.println("Anne's unsigned message - " + Arrays.toString(anneMsg));
 
-        // Compress Anne's message.
+        // 3. Compress Anne's message.
         byte[] anneMsgCompressed = compressData(anneMsg);
         System.out.println("Anne's unsigned compressed message - " + Arrays.toString(anneMsgCompressed));
 
-        // Hash Anne's compressed message.
+        // 3. Hash Anne's compressed message.
         byte[] anneMsgHashedCompressed = calculateSha3Digest(anneMsgCompressed);
         System.out.println("Anne's unsigned hashed compressed message - " + Arrays.toString(anneMsgHashedCompressed));
 
-        // Sign Anne's message with Anne's private key.
+        // 4. Sign Anne's message with Anne's private key.
         byte[] anneSignedMsg = generatePkcs1Signature(anneKeys.getPrivate(), anneMsgHashedCompressed);
         System.out.println("Anne's signed message - " + Arrays.toString(anneSignedMsg));
 
-        // Verify Anne's message with Anne's public key.
-        boolean bobReceivesAnneMsg = verifyPkcs1Signature(anneKeys.getPublic(), anneMsg, anneSignedMsg);
+        // 5. Combine Anne's signed message with the original message.
+        byte[][] anneSignedMsgDigest = {anneSignedMsg, anneMsg};
+        System.out.println("Anne's signed message digest - " + Arrays.toString(anneSignedMsgDigest));
+
+        // Imagine message has been sent securely to Bob.
+
+        // 16. Compress message portion.
+        byte[] anneComparisonCompressed = compressData(anneSignedMsgDigest[1]);
+        System.out.println("Anne's received message compressed - " + Arrays.toString(anneComparisonCompressed));
+
+        // 16. Hash compressed message.
+        byte[] anneComparisonHash = calculateSha3Digest(anneComparisonCompressed);
+        System.out.println("Anne's received message hashed - " + Arrays.toString(anneComparisonHash));
+
+        // 17. Verify Anne's message with Anne's public key.
+        boolean bobReceivesAnneMsg = verifyPkcs1Signature(anneKeys.getPublic(), anneComparisonHash, anneSignedMsgDigest[0]);
         System.out.println("Bob successfully verified Anne's message - " + bobReceivesAnneMsg);
     }
 }
