@@ -1,12 +1,48 @@
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
+import org.bouncycastle.jcajce.spec.KTSParameterSpec;
 import org.bouncycastle.util.Strings;
 
+import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.KeyPair;
+import java.security.*;
 import java.util.Arrays;
 
 public class HashingAndEncryption {
+
+    /**
+     * Wrap a secret key with a public key.
+     * @param rsaPublic The public key of the receiver.
+     * @param secretKey The secret key you want to wrap.
+     * @return The wrapped key.
+     * @throws GeneralSecurityException In case of any security errors.
+     */
+    public static byte[] kemKeyWrap(PublicKey rsaPublic, SecretKey secretKey)
+            throws GeneralSecurityException
+    {
+        Cipher c = Cipher.getInstance("RSA-KTS-KEM-KWS", "BCFIPS");
+        c.init(Cipher.WRAP_MODE, rsaPublic,
+                new KTSParameterSpec.Builder(
+                        NISTObjectIdentifiers.id_aes256_wrap.getId(), 256).build());
+        return c.wrap(secretKey);
+    }
+
+    /**
+     * Unwrap a secret key with a private key.
+     * @param rsaPrivate The private key of the receiver.
+     * @param wrappedKey The bytes of the secret key you want to unwrap.
+     * @return The unwrapped key's bytes.
+     * @throws GeneralSecurityException In case of any security errors.
+     */
+    public static Key kemKeyUnwrap(PrivateKey rsaPrivate, byte[] wrappedKey)
+            throws GeneralSecurityException
+    {
+        Cipher c = Cipher.getInstance("RSA-KTS-KEM-KWS", "BCFIPS");
+        c.init(Cipher.UNWRAP_MODE, rsaPrivate,
+                new KTSParameterSpec.Builder(
+                        NISTObjectIdentifiers.id_aes256_wrap.getId(), 256).build());
+        return c.unwrap(wrappedKey, "AES", Cipher.SECRET_KEY);
+    }
 
     public static void main(String[] args) throws GeneralSecurityException, IOException {
         Hashing.installProvider();
@@ -41,16 +77,29 @@ public class HashingAndEncryption {
         byte[] anneSignedMsg = Hashing.generatePkcs1Signature(anneKeys.getPrivate(), anneMsgHashedCompressed);
         System.out.println("Anne's signed message - " + Arrays.toString(anneSignedMsg));
 
-        // 5. Combine Anne's signed message with the original message.
-        byte[][] anneSignedMsgDigest = {anneSignedMsg, anneMsg};
-        System.out.println("Anne's signed message digest - " + Arrays.toString(anneSignedMsgDigest));
-
-        // 6. Generate one-time secret key.
-        // Initialise and generate a key.
+        // 6. Initialise and generate one-time secret key.
         Encryption.defineKey(new byte[128 / 8]);
         Encryption.defineKey(new byte[192 / 8]);
         Encryption.defineKey(new byte[256 / 8]);
         SecretKey oneTimeKey = Encryption.generateKey();
+
+        // 7. Encrypt messages with one time key.
+        byte[][] anneSignedMsgEncrypted = Encryption.cbcEncrypt(oneTimeKey, anneSignedMsg);
+        byte[][] anneMsgEncrypted = Encryption.cbcEncrypt(oneTimeKey, anneMsg);
+
+        // 5. Combine Anne's signed message with the original message.
+        byte[][][] anneSignedMsgDigest = {anneSignedMsgEncrypted, anneMsgEncrypted};
+        System.out.println("Anne's signed message digest - " + Arrays.toString(anneSignedMsgDigest));
+
+        // 8. Sign the one-time key with server's public key.
+        byte[][] signedOneTimeKey = Encryption.cbcEncrypt(Encryption.defineKey(serverKeys.getPublic().getEncoded()), oneTimeKey.getEncoded());
+
+        // 9. Combine signed one time key with signed message digest.
+        KeyWithMessageDigest keyWithMessageDigest = new KeyWithMessageDigest(signedOneTimeKey, anneSignedMsgDigest);
+        System.out.println(keyWithMessageDigest);
+
+        // 10. Decrypt one time key.
+        byte[] decryptedKeyContents = Encryption.cbcDecrypt()
 
         // Imagine message has been sent securely to Bob.
 
