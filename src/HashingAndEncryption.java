@@ -10,12 +10,7 @@ public class HashingAndEncryption {
     public static void main(String[] args) throws GeneralSecurityException, IOException {
         Hashing.installProvider();
 
-        // Initialise server keys.
-        KeyPair serverKeys = Hashing.generateKeyPair();
-        System.out.println("Server's public key - " + serverKeys.getPublic());
-        System.out.println("Server's private key - " + serverKeys.getPrivate());
-
-        // Initialise and generate sender/receiver keys.
+        // 1.1. Initialise and generate sender/receiver keys.
         KeyPair anneKeys = Hashing.generateKeyPair();
         System.out.println("Anne's public key - " + anneKeys.getPublic());
         System.out.println("Anne's private key - " + anneKeys.getPrivate());
@@ -23,6 +18,11 @@ public class HashingAndEncryption {
         KeyPair bobKeys = Hashing.generateKeyPair();
         System.out.println("Bob's public key - " + bobKeys.getPublic());
         System.out.println("Bob's private key - " + bobKeys.getPrivate());
+
+        // 1.2. Initialise server keys.
+        KeyPair serverKeys = Hashing.generateKeyPair();
+        System.out.println("Server's public key - " + serverKeys.getPublic());
+        System.out.println("Server's private key - " + serverKeys.getPrivate());
 
         // Generate Anne's message.
         byte[] anneMsg = Strings.toByteArray("Houston, we are hidden.");
