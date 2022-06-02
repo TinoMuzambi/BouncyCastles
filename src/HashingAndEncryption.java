@@ -10,6 +10,11 @@ public class HashingAndEncryption {
     public static void main(String[] args) throws GeneralSecurityException, IOException {
         Hashing.installProvider();
 
+        // Initialise server keys.
+        KeyPair serverKeys = Hashing.generateKeyPair();
+        System.out.println("Server's public key - " + serverKeys.getPublic());
+        System.out.println("Server's private key - " + serverKeys.getPrivate());
+
         // Initialise and generate sender/receiver keys.
         KeyPair anneKeys = Hashing.generateKeyPair();
         System.out.println("Anne's public key - " + anneKeys.getPublic());
