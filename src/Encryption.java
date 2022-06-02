@@ -55,7 +55,7 @@ public class Encryption {
     }
 
     /**
-     * COnverts a key's bytes to a SecurityKey.
+     * Converts a key's bytes to a SecurityKey.
      * @param keyBytes The encoded key you want to convert.
      * @return A SecretKey from the encoded key provided.
      */
