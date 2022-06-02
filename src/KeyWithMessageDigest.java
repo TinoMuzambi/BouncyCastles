@@ -1,5 +1,8 @@
 import java.util.Arrays;
 
+/**
+ * A class for wrapping a signed one time key with a signed message digest.
+ */
 public class KeyWithMessageDigest {
 
     private final byte[] oneTimeKey;
