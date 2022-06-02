@@ -1,13 +1,18 @@
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cms.CMSCompressedData;
 import org.bouncycastle.cms.CMSCompressedDataGenerator;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.OutputCompressor;
 import org.bouncycastle.util.Strings;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.*;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.Arrays;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterOutputStream;
 
 public class Hashing {
     /**
@@ -80,11 +85,23 @@ public class Hashing {
      * @throws IOException In case of errors in compression.
      */
     public static byte[] compressData(byte[] data) throws IOException {
-        CMSCompressedDataGenerator gen = new CMSCompressedDataGenerator();
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            DeflaterOutputStream defl = new DeflaterOutputStream(out);
+            defl.write(data);
+            defl.flush();
+            defl.close();
 
-        CMSProcessableByteArray processableByteArray = new CMSProcessableByteArray(data);
+            return out.toByteArray();
+    }
 
-        return processableByteArray.getContentType().getEncoded();
+    public static byte[] decompressData(byte[] data) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        InflaterOutputStream infl = new InflaterOutputStream(out);
+        infl.write(data);
+        infl.flush();
+        infl.close();
+
+        return out.toByteArray();
     }
 
     /**
