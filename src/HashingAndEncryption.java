@@ -1,5 +1,6 @@
 import org.bouncycastle.util.Strings;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
@@ -43,6 +44,13 @@ public class HashingAndEncryption {
         // 5. Combine Anne's signed message with the original message.
         byte[][] anneSignedMsgDigest = {anneSignedMsg, anneMsg};
         System.out.println("Anne's signed message digest - " + Arrays.toString(anneSignedMsgDigest));
+
+        // 6. Generate one-time secret key.
+        // Initialise and generate a key.
+        Encryption.defineKey(new byte[128 / 8]);
+        Encryption.defineKey(new byte[192 / 8]);
+        Encryption.defineKey(new byte[256 / 8]);
+        SecretKey oneTimeKey = Encryption.generateKey();
 
         // Imagine message has been sent securely to Bob.
 
