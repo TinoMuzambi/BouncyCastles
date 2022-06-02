@@ -1,6 +1,10 @@
+import org.bouncycastle.cms.CMSCompressedData;
+import org.bouncycastle.cms.CMSCompressedDataGenerator;
+import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Strings;
 
+import java.io.IOException;
 import java.security.*;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.Arrays;
@@ -67,6 +71,20 @@ public class Hashing {
         MessageDigest hash = MessageDigest.getInstance("SHA3-512", "BC");
 
         return hash.digest(data);
+    }
+
+    /**
+     * Compresses data.
+     * @param data The data you want to compress.
+     * @return The compressed data.
+     * @throws IOException In case of errors in compression.
+     */
+    public static byte[] compressData(byte[] data) throws IOException {
+        CMSCompressedDataGenerator gen = new CMSCompressedDataGenerator();
+
+        CMSProcessableByteArray processableByteArray = new CMSProcessableByteArray(data);
+
+        return processableByteArray.getContentType().getEncoded();
     }
 
     /**
