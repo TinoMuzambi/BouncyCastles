@@ -1,4 +1,3 @@
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Strings;
 
 import javax.crypto.Cipher;
@@ -8,7 +7,6 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import java.security.GeneralSecurityException;
-import java.security.Security;
 import java.util.Arrays;
 
 public class Encryption {
