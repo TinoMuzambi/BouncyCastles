@@ -56,7 +56,7 @@ public class Hashing {
     }
 
     /**
-     * Compute and return a hash of a message.
+     * Compute and return a hash of a message using the SHA-3 algorithm.
      * @param data The data we want to hash.
      * @return The hashed data.
      * @throws GeneralSecurityException in case of security errors.
@@ -94,8 +94,12 @@ public class Hashing {
         byte[] anneMsg = Strings.toByteArray("Houston, we are hidden.");
         System.out.println("Anne's unsigned message - " + Arrays.toString(anneMsg));
 
+        // Hash Anne's message.
+        byte[] anneMsgHashed = calculateSha3Digest(anneMsg);
+        System.out.println("Anne's unsigned hashed message - " + Arrays.toString(anneMsgHashed));
+
         // Sign Anne's message with Anne's private key.
-        byte[] anneSignedMsg = generatePkcs1Signature(anneKeys.getPrivate(), anneMsg);
+        byte[] anneSignedMsg = generatePkcs1Signature(anneKeys.getPrivate(), anneMsgHashed);
         System.out.println("Anne's signed message - " + Arrays.toString(anneSignedMsg));
 
         // Verify Anne's message with Anne's public key.
