@@ -66,16 +66,9 @@ public class Encryption {
         return new SecretKeySpec(keyBytes, "AES");
     }
 
-    /**
-     * Install Bouncy Castle provider.
-     */
-    public static void installProvider()
-    {
-        Security.addProvider(new BouncyCastleProvider());
-    }
 
     public static void main(String[] args) throws GeneralSecurityException {
-        installProvider();
+        Hashing.installProvider();
 
         // Initialise and generate a key.
         defineKey(new byte[128 / 8]);

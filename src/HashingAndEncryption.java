@@ -20,7 +20,7 @@ public class HashingAndEncryption {
     public static byte[] kemKeyWrap(PublicKey rsaPublic, SecretKey secretKey)
             throws GeneralSecurityException
     {
-        Cipher c = Cipher.getInstance("RSA-KTS-KEM-KWS", "BCFIPS");
+        Cipher c = Cipher.getInstance("RSA-KTS-KEM-KWS", "BC");
         c.init(Cipher.WRAP_MODE, rsaPublic,
                 new KTSParameterSpec.Builder(
                         NISTObjectIdentifiers.id_aes256_wrap.getId(), 256).build());
@@ -37,7 +37,7 @@ public class HashingAndEncryption {
     public static Key kemKeyUnwrap(PrivateKey rsaPrivate, byte[] wrappedKey)
             throws GeneralSecurityException
     {
-        Cipher c = Cipher.getInstance("RSA-KTS-KEM-KWS", "BCFIPS");
+        Cipher c = Cipher.getInstance("RSA-KTS-KEM-KWS", "BC");
         c.init(Cipher.UNWRAP_MODE, rsaPrivate,
                 new KTSParameterSpec.Builder(
                         NISTObjectIdentifiers.id_aes256_wrap.getId(), 256).build());
@@ -91,28 +91,15 @@ public class HashingAndEncryption {
         byte[][][] anneSignedMsgDigest = {anneSignedMsgEncrypted, anneMsgEncrypted};
         System.out.println("Anne's signed message digest - " + Arrays.toString(anneSignedMsgDigest));
 
-        // 8. Sign the one-time key with server's public key.
-        byte[][] signedOneTimeKey = Encryption.cbcEncrypt(Encryption.defineKey(serverKeys.getPublic().getEncoded()), oneTimeKey.getEncoded());
+        // 8. Encrypt the one-time key with server's public key.
+        byte[] signedOneTimeKey = kemKeyWrap(serverKeys.getPublic(), oneTimeKey);
 
         // 9. Combine signed one time key with signed message digest.
         KeyWithMessageDigest keyWithMessageDigest = new KeyWithMessageDigest(signedOneTimeKey, anneSignedMsgDigest);
-        System.out.println(keyWithMessageDigest);
+        System.out.println("Signed one-time key with message digest. - " + keyWithMessageDigest);
 
-        // 10. Decrypt one time key.
-        byte[] decryptedKeyContents = Encryption.cbcDecrypt()
-
-        // Imagine message has been sent securely to Bob.
-
-        // 16. Compress message portion.
-        byte[] anneComparisonCompressed = Hashing.compressData(anneSignedMsgDigest[1]);
-        System.out.println("Anne's received message compressed - " + Arrays.toString(anneComparisonCompressed));
-
-        // 16. Hash compressed message.
-        byte[] anneComparisonHash = Hashing.calculateSha3Digest(anneComparisonCompressed);
-        System.out.println("Anne's received message hashed - " + Arrays.toString(anneComparisonHash));
-
-        // 17. Verify Anne's message with Anne's public key.
-        boolean bobReceivesAnneMsg = Hashing.verifyPkcs1Signature(anneKeys.getPublic(), anneComparisonHash, anneSignedMsgDigest[0]);
-        System.out.println("Bob successfully verified Anne's message - " + bobReceivesAnneMsg);
+        // 10. Decrypt one time key with server's private key.
+        SecretKey decryptedOneTimeKey = (SecretKey) kemKeyUnwrap(serverKeys.getPrivate(), keyWithMessageDigest.getOneTimeKey());
+        System.out.println(decryptedOneTimeKey.toString());
     }
 }

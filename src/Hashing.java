@@ -1,3 +1,4 @@
+import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Strings;
 
@@ -111,6 +112,7 @@ public class Hashing {
     public static void installProvider()
     {
         Security.addProvider(new BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleFipsProvider());
     }
 
     public static void main(String[] args) throws GeneralSecurityException, IOException {
