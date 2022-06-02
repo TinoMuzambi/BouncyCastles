@@ -56,6 +56,20 @@ public class Hashing {
     }
 
     /**
+     * Compute and return a hash of a message.
+     * @param data The data we want to hash.
+     * @return The hashed data.
+     * @throws GeneralSecurityException in case of security errors.
+     */
+    public static byte[] calculateSha3Digest(byte[] data)
+            throws GeneralSecurityException
+    {
+        MessageDigest hash = MessageDigest.getInstance("SHA3-512", "BC");
+
+        return hash.digest(data);
+    }
+
+    /**
      * Install Bouncy Castle provider.
      */
     public static void installProvider()
