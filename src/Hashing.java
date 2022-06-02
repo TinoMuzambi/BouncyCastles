@@ -125,7 +125,6 @@ public class Hashing {
         System.out.println("Bob's public key - " + bobKeys.getPublic());
         System.out.println("Bob's private key - " + bobKeys.getPrivate());
 
-        // The below represents hashing. This provides us with message integrity
         // Generate Anne's message.
         byte[] anneMsg = Strings.toByteArray("Houston, we are hidden.");
         System.out.println("Anne's unsigned message - " + Arrays.toString(anneMsg));
