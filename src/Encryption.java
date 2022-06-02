@@ -18,7 +18,7 @@ public class Encryption {
     public static SecretKey generateKey()
             throws GeneralSecurityException
     {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES", "BC");
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES", "BCFIPS");
         keyGenerator.init(256);
         return keyGenerator.generateKey();
     }
@@ -32,7 +32,7 @@ public class Encryption {
      */
     public static byte[][] cbcEncrypt(SecretKey key, byte[] data)
             throws GeneralSecurityException {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC");
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BCFIPS");
         cipher.init(Cipher.ENCRYPT_MODE, key);
         return new byte[][]{cipher.getIV(), cipher.doFinal(data)};
     }
@@ -47,7 +47,7 @@ public class Encryption {
      */
     public static byte[] cbcDecrypt(SecretKey key, byte[] iv, byte[] cipherText)
             throws GeneralSecurityException {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC");
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BCFIPS");
         cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
         return cipher.doFinal(cipherText);
     }

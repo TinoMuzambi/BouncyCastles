@@ -17,7 +17,7 @@ public class Hashing {
      * @throws GeneralSecurityException in case of security errors.
      */
     public static KeyPair generateKeyPair() throws GeneralSecurityException {
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", "BC");
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", "BCFIPS");
         keyPairGenerator.initialize(new RSAKeyGenParameterSpec(3072, RSAKeyGenParameterSpec.F4));
         return keyPairGenerator.generateKeyPair();
     }
@@ -32,7 +32,7 @@ public class Hashing {
     public static byte[] generatePkcs1Signature(PrivateKey rsaPrivate, byte[] input)
             throws GeneralSecurityException
     {
-        Signature signature = Signature.getInstance("SHA384withRSA", "BC");
+        Signature signature = Signature.getInstance("SHA384withRSA", "BCFIPS");
 
         signature.initSign(rsaPrivate);
 
@@ -51,7 +51,7 @@ public class Hashing {
     public static boolean verifyPkcs1Signature(PublicKey rsaPublic, byte[] input, byte[] encSignature)
             throws GeneralSecurityException
     {
-        Signature signature = Signature.getInstance("SHA384withRSA", "BC");
+        Signature signature = Signature.getInstance("SHA384withRSA", "BCFIPS");
 
         signature.initVerify(rsaPublic);
 
@@ -69,7 +69,7 @@ public class Hashing {
     public static byte[] calculateSha3Digest(byte[] data)
             throws GeneralSecurityException
     {
-        MessageDigest hash = MessageDigest.getInstance("SHA3-512", "BC");
+        MessageDigest hash = MessageDigest.getInstance("SHA3-512", "BCFIPS");
 
         return hash.digest(data);
     }
@@ -111,7 +111,7 @@ public class Hashing {
      */
     public static void installProvider()
     {
-        Security.addProvider(new BouncyCastleProvider());
+//        Security.addProvider(new BouncyCastleProvider());
         Security.addProvider(new BouncyCastleFipsProvider());
     }
 
