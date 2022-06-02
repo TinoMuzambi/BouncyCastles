@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class KeyWithMessageDigest {
 
     private final byte[][] oneTimeKey;
@@ -14,5 +16,13 @@ public class KeyWithMessageDigest {
 
     public byte[][][] getMessageDigest() {
         return messageDigest;
+    }
+
+    @Override
+    public String toString() {
+        return "KeyWithMessageDigest{" +
+                "oneTimeKey=" + Arrays.toString(oneTimeKey) +
+                ", messageDigest=" + Arrays.toString(messageDigest) +
+                '}';
     }
 }
