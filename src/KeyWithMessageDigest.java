@@ -1,9 +1,9 @@
 public class KeyWithMessageDigest {
 
     private final byte[][] oneTimeKey;
-    private final byte[][] messageDigest;
+    private final byte[][][] messageDigest;
 
-    public KeyWithMessageDigest(byte[][] oneTimeKey, byte[][] messageDigest) {
+    public KeyWithMessageDigest(byte[][] oneTimeKey, byte[][][] messageDigest) {
         this.oneTimeKey = oneTimeKey;
         this.messageDigest = messageDigest;
     }
@@ -12,7 +12,7 @@ public class KeyWithMessageDigest {
         return oneTimeKey;
     }
 
-    public byte[][] getMessageDigest() {
+    public byte[][][] getMessageDigest() {
         return messageDigest;
     }
 }
