@@ -74,7 +74,7 @@ public class Hashing {
     }
 
     /**
-     * Compresses data.
+     * Compresses data using ZIP.
      * @param data The data you want to compress.
      * @return The compressed data.
      * @throws IOException In case of errors in compression.
@@ -107,7 +107,7 @@ public class Hashing {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    public static void main(String[] args) throws GeneralSecurityException {
+    public static void main(String[] args) throws GeneralSecurityException, IOException {
         installProvider();
 
         // Initialise and generate sender/receiver keys.
@@ -124,12 +124,16 @@ public class Hashing {
         byte[] anneMsg = Strings.toByteArray("Houston, we are hidden.");
         System.out.println("Anne's unsigned message - " + Arrays.toString(anneMsg));
 
-        // Hash Anne's message.
-        byte[] anneMsgHashed = calculateSha3Digest(anneMsg);
-        System.out.println("Anne's unsigned hashed message - " + Arrays.toString(anneMsgHashed));
+        // Compress Anne's message.
+        byte[] anneMsgCompressed = compressData(anneMsg);
+        System.out.println("Anne's unsigned compressed message - " + Arrays.toString(anneMsgCompressed));
+
+        // Hash Anne's compressed message.
+        byte[] anneMsgHashedCompressed = calculateSha3Digest(anneMsgCompressed);
+        System.out.println("Anne's unsigned hashed compressed message - " + Arrays.toString(anneMsgHashedCompressed));
 
         // Sign Anne's message with Anne's private key.
-        byte[] anneSignedMsg = generatePkcs1Signature(anneKeys.getPrivate(), anneMsgHashed);
+        byte[] anneSignedMsg = generatePkcs1Signature(anneKeys.getPrivate(), anneMsgHashedCompressed);
         System.out.println("Anne's signed message - " + Arrays.toString(anneSignedMsg));
 
         // Verify Anne's message with Anne's public key.
