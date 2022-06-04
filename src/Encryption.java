@@ -85,6 +85,8 @@ public class Encryption {
         byte[][] bobEncryptedMsg = cbcEncrypt(secretKey, bobMsg);
         System.out.println("Bob's encrypted message - " + Arrays.toString(bobEncryptedMsg[1]));
 
+        // Imagine that it's been securely sent to Anne.
+
         // Decrypt Bob's message with secret key.
         byte[] bobDecryptedMsg = cbcDecrypt(secretKey, bobEncryptedMsg[0], bobEncryptedMsg[1]);
         System.out.println("Bob's decrypted message - " + Arrays.toString(bobDecryptedMsg));
