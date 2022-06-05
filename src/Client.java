@@ -75,6 +75,7 @@ public class Client {
                 // 9. Combine signed one time key with signed message digest.
                 KeyWithMessageDigest keyWithMessageDigest = new KeyWithMessageDigest(signedOneTimeKey, signedMessageDigest);
 
+                // 9. Send to server.
                 bufferedWriter.write(name + ": " + keyWithMessageDigest);
 
                 bufferedWriter.newLine();
