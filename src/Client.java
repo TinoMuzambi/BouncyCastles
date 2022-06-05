@@ -1,3 +1,6 @@
+import org.bouncycastle.util.Strings;
+
+import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
 import java.security.*;
@@ -41,12 +44,36 @@ public class Client {
             Scanner scanner = new Scanner(System.in);
             while (socket.isConnected()) {
                 String messageToSend = scanner.nextLine();
+                byte[] messageToSendBytes = Strings.toByteArray(messageToSend);
+
+                // 3. Compress message.
+                byte[] messageToSendBytesCompressed = Hashing.compressData(messageToSendBytes);
+
+                // 3. Hash compressed message.
+                byte[] messageToSendBytesCompressedHashed = Hashing.calculateSha3Digest(messageToSendBytesCompressed);
+
+                // 4. Sign message with private key.
+                byte[] signedMessage = Hashing.generatePkcs1Signature(privateKey, messageToSendBytesCompressedHashed);
+
+                // 6. Initialise and generate one-time secret key.
+                Encryption.defineKey(new byte[128 / 8]);
+                Encryption.defineKey(new byte[192 / 8]);
+                Encryption.defineKey(new byte[256 / 8]);
+                SecretKey oneTimeKey = Encryption.generateKey();
+
+                // 7. Encrypt messages with one time key.
+                byte[][] signedMessageEncrypted = Encryption.cbcEncrypt(oneTimeKey, signedMessage);
+                byte[][] messageToSendBytesEncrypted = Encryption.cbcEncrypt(oneTimeKey, messageToSendBytes);
+
+                // 5. Combine signed message with the original message.
+                byte[][][] signedMsgDigest = {signedMessageEncrypted, messageToSendBytesEncrypted};
+
                 bufferedWriter.write(name + ": " + messageToSend);
 
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
             }
-        } catch (IOException e) {
+        } catch (IOException | GeneralSecurityException e) {
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
