@@ -181,7 +181,7 @@ public class Client {
             client.listenForMessage();
             client.sendMessage();
 
-        }catch (Exception ingored){}
+        }catch (Exception ignored){}
 
     }
 
