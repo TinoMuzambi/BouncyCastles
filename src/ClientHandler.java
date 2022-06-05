@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.logging.SocketHandler;
 
@@ -10,16 +11,16 @@ public class ClientHandler implements Runnable{
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
     private String name;
-    private String message;
+//    private PublicKey publicKey;
+    private PublicKey serverPublicKey;
 
-
-    public ClientHandler(Socket socket){
+    public ClientHandler(Socket socket, PublicKey serverPublicKey){
         try {
             this.socket = socket;
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.name = bufferedReader.readLine();
-
+            this.serverPublicKey = serverPublicKey;
 
             clientHandlers.add(this);
             broadcastMessage("SERVER: " + name +"" +" " + " has joined the group chat");

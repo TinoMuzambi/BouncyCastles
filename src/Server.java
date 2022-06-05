@@ -23,7 +23,7 @@ public class Server {
         while (!serverSocket.isClosed()) {
             Socket socket = serverSocket.accept();
             System.out.println("Connection established!");
-            ClientHandler clientHandler = new ClientHandler(socket);
+            ClientHandler clientHandler = new ClientHandler(socket, publicKey);
 
             Thread thread = new Thread(clientHandler);
             thread.start();
