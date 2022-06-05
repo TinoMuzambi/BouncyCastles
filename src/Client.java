@@ -66,7 +66,14 @@ public class Client {
                 byte[][] messageToSendBytesEncrypted = Encryption.cbcEncrypt(oneTimeKey, messageToSendBytes);
 
                 // 5. Combine signed message with the original message.
-                byte[][][] signedMsgDigest = {signedMessageEncrypted, messageToSendBytesEncrypted};
+                byte[][][] signedMessageDigest = {signedMessageEncrypted, messageToSendBytesEncrypted};
+
+                // TODO: Server needs to be able to send its public key to clients.
+                // 8. Encrypt the one-time key with server's public key.
+                byte[] signedOneTimeKey = HashingAndEncryption.kemKeyWrap(serverKeys.getPublic(), oneTimeKey);
+
+                // 9. Combine signed one time key with signed message digest.
+                KeyWithMessageDigest keyWithMessageDigest = new KeyWithMessageDigest(signedOneTimeKey, signedMessageDigest);
 
                 bufferedWriter.write(name + ": " + messageToSend);
 
