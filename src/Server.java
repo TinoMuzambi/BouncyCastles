@@ -1,10 +1,8 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.security.GeneralSecurityException;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 
 public class Server {
     private final ServerSocket serverSocket;
@@ -28,7 +26,7 @@ public class Server {
                 Thread thread = new Thread(clientHandler);
                 thread.start();
             }
-        } catch (IOException ignored){
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException ignored){
         }
     }
 

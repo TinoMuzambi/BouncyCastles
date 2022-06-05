@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.Socket;
 import java.security.*;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Client {
@@ -32,7 +33,7 @@ public class Client {
 
     public void sendMessage() {
         try {
-            bufferedWriter.write(name + " - " + publicKey.toString());
+            bufferedWriter.write(name + " - " + Arrays.toString(publicKey.getEncoded()));
 
             bufferedWriter.newLine();
             bufferedWriter.flush();
