@@ -9,7 +9,7 @@ public class ClientHandler implements Runnable{
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
     private String name;
-    private String message;
+    private String publicKey;
 
 
     public ClientHandler(Socket socket){
@@ -20,7 +20,7 @@ public class ClientHandler implements Runnable{
             this.name = bufferedReader.readLine();
 
             clientHandlers.add(this);
-            broadcastMessage("SERVER: " + name +"" +" " + " has joined the group chat");
+            broadcastMessage("SERVER: " + name + " has joined the group chat");
         } catch (IOException e){
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
@@ -57,7 +57,7 @@ public class ClientHandler implements Runnable{
 
     public void removeClientHandler(){
         clientHandlers.remove(this);
-        broadcastMessage("SERVER: " + name +"" +" " + "has left the chat!");
+        broadcastMessage("SERVER: " + name +" " + "has left the chat!");
     }
 
     public void closeEverything(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter){

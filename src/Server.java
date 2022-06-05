@@ -1,12 +1,21 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.GeneralSecurityException;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 public class Server {
     private final ServerSocket serverSocket;
+    private PrivateKey privateKey;
+    private PublicKey publicKey;
 
-    public Server(ServerSocket serverSocket) {
+    public Server(ServerSocket serverSocket) throws GeneralSecurityException {
         this.serverSocket = serverSocket;
+        KeyPair pair = Hashing.generateKeyPair();
+        this.privateKey = pair.getPrivate();
+        this.publicKey = pair.getPublic();
     }
 
     public void startServer(){

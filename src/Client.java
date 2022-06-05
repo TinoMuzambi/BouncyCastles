@@ -14,7 +14,7 @@ public class Client {
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
-    public Client(Socket socket, String name, String message) {
+    public Client(Socket socket, String name, String message) throws GeneralSecurityException {
 
         try {
             this.socket = socket;
@@ -22,20 +22,11 @@ public class Client {
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.name = name;
             this.message = message;
-            init();
+            KeyPair pair = Hashing.generateKeyPair();
+            this.privateKey = pair.getPrivate();
+            this.publicKey = pair.getPublic();
         } catch (IOException e) {
             closeEverything(socket, bufferedReader, bufferedWriter);
-        }
-    }
-
-    public void init() {
-        try {
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-            generator.initialize(1024);
-            KeyPair pair = generator.generateKeyPair();
-            privateKey = pair.getPrivate();
-            publicKey = pair.getPublic();
-        } catch (Exception ignored) {
         }
     }
 
@@ -108,11 +99,12 @@ public class Client {
 
             Client client = new Client(socket, name, message);
 
-            String encryptedMessage = client.encrypt(message);
-            String decryptedMessage = client.decrypt(encryptedMessage);
+//            String encryptedMessage = client.encrypt(message);
+//            String decryptedMessage = client.decrypt(encryptedMessage);
 
-            System.err.println("Encrypted:\n" + encryptedMessage);
-            System.err.println("Decrypted:\n" + decryptedMessage);
+//            System.err.println("Encrypted:\n" + encryptedMessage);
+//            System.err.println("Decrypted:\n" + decryptedMessage);
+            System.err.println(message);
 
             client.listenForMessage();
             client.sendMessage();
