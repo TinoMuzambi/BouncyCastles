@@ -104,16 +104,15 @@ public class Client {
             System.out.println("Enter your message");
             String message = scanner.nextLine();
 
-
             Socket socket = new Socket("localhost", 1235);
 
             Client client = new Client(socket, name, message);
 
             String encryptedMessage = client.encrypt(message);
-            String descruptedMessage = client.decrypt(encryptedMessage);
+            String decryptedMessage = client.decrypt(encryptedMessage);
 
             System.err.println("Encrypted:\n" + encryptedMessage);
-            System.err.println("Decrypted:\n" + descruptedMessage);
+            System.err.println("Decrypted:\n" + decryptedMessage);
 
             client.listenForMessage();
             client.sendMessage();
