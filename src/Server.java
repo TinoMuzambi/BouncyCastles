@@ -11,6 +11,7 @@ public class Server {
     }
 
     public void startServer(){
+        System.err.println("SERVER STARTED");
 
         try{
 
