@@ -13,6 +13,15 @@ public class KeyWithMessageDigest {
         this.messageDigest = messageDigest;
     }
 
+//    public KeyWithMessageDigest(String keyWithMessageDigest) {
+//        String oneTimeKeyFromString = keyWithMessageDigest.substring(keyWithMessageDigest.indexOf("oneTimeKey=") + 11, keyWithMessageDigest.indexOf(", messageDigest="));
+//        this.oneTimeKey = oneTimeKeyFromString.getBytes();
+//
+//        String messageDigestFromString = keyWithMessageDigest.substring(keyWithMessageDigest.indexOf(", messageDigest=") + 16);
+//        messageDigestFromString = messageDigestFromString.substring(0, messageDigestFromString.length() - 1);
+//        this.messageDigest = messageDigestFromString;
+//    }
+
     public byte[] getOneTimeKey() {
         return oneTimeKey;
     }

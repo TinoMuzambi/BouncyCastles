@@ -15,20 +15,21 @@ public class Client {
     private String name;
     private String message;
 
-    private PrivateKey privateKey;
-    private PublicKey publicKey;
+    KeyPair pair = Hashing.generateKeyPair();
+    private final PrivateKey privateKey = pair.getPrivate();;
+    private final PublicKey publicKey = pair.getPublic();
+
 
     public Client(Socket socket, String name, String message) throws GeneralSecurityException {
-
         try {
+            System.out.println(privateKey.toString());
+            System.out.println(publicKey.toString());
             this.socket = socket;
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.name = name;
             this.message = message;
-            KeyPair pair = Hashing.generateKeyPair();
-            this.privateKey = pair.getPrivate();
-            this.publicKey = pair.getPublic();
+            this.bufferedWriter.write(name + " - " + Arrays.toString(publicKey.getEncoded()));
         } catch (IOException e) {
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
@@ -36,7 +37,7 @@ public class Client {
 
     public void sendMessage() {
         try {
-            bufferedWriter.write(name + " - " + Arrays.toString(publicKey.getEncoded()));
+            bufferedWriter.write(name);
 
             bufferedWriter.newLine();
             bufferedWriter.flush();
@@ -44,44 +45,45 @@ public class Client {
             Scanner scanner = new Scanner(System.in);
             while (socket.isConnected()) {
                 String messageToSend = scanner.nextLine();
-                byte[] messageToSendBytes = Strings.toByteArray(messageToSend);
-
-                // 3. Compress message.
-                byte[] messageToSendBytesCompressed = Hashing.compressData(messageToSendBytes);
-
-                // 3. Hash compressed message.
-                byte[] messageToSendBytesCompressedHashed = Hashing.calculateSha3Digest(messageToSendBytesCompressed);
-
-                // 4. Sign message with private key.
-                byte[] signedMessage = Hashing.generatePkcs1Signature(privateKey, messageToSendBytesCompressedHashed);
-
-                // 6. Initialise and generate one-time secret key.
-                Encryption.defineKey(new byte[128 / 8]);
-                Encryption.defineKey(new byte[192 / 8]);
-                Encryption.defineKey(new byte[256 / 8]);
-                SecretKey oneTimeKey = Encryption.generateKey();
-
-                // 7. Encrypt messages with one time key.
-                byte[][] signedMessageEncrypted = Encryption.cbcEncrypt(oneTimeKey, signedMessage);
-                byte[][] messageToSendBytesEncrypted = Encryption.cbcEncrypt(oneTimeKey, messageToSendBytes);
-
-                // 5. Combine signed message with the original message.
-                byte[][][] signedMessageDigest = {signedMessageEncrypted, messageToSendBytesEncrypted};
-
-                // TODO: Server needs to be able to send its public key to clients.
-                // 8. Encrypt the one-time key with server's public key.
-                byte[] signedOneTimeKey = HashingAndEncryption.kemKeyWrap(serverKeys.getPublic(), oneTimeKey);
-
-                // 9. Combine signed one time key with signed message digest.
-                KeyWithMessageDigest keyWithMessageDigest = new KeyWithMessageDigest(signedOneTimeKey, signedMessageDigest);
+//                byte[] messageToSendBytes = Strings.toByteArray(messageToSend);
+//
+//                // 3. Compress message.
+//                byte[] messageToSendBytesCompressed = Hashing.compressData(messageToSendBytes);
+//
+//                // 3. Hash compressed message.
+//                byte[] messageToSendBytesCompressedHashed = Hashing.calculateSha3Digest(messageToSendBytesCompressed);
+//
+//                // 4. Sign message with private key.
+//                byte[] signedMessage = Hashing.generatePkcs1Signature(privateKey, messageToSendBytesCompressedHashed);
+//
+//                // 6. Initialise and generate one-time secret key.
+//                Encryption.defineKey(new byte[128 / 8]);
+//                Encryption.defineKey(new byte[192 / 8]);
+//                Encryption.defineKey(new byte[256 / 8]);
+//                SecretKey oneTimeKey = Encryption.generateKey();
+//
+//                // 7. Encrypt messages with one time key.
+//                byte[][] signedMessageEncrypted = Encryption.cbcEncrypt(oneTimeKey, signedMessage);
+//                byte[][] messageToSendBytesEncrypted = Encryption.cbcEncrypt(oneTimeKey, messageToSendBytes);
+//
+//                // 5. Combine signed message with the original message.
+//                byte[][][] signedMessageDigest = {signedMessageEncrypted, messageToSendBytesEncrypted};
+//
+//                // TODO: Server needs to be able to send its public key to clients.
+//                // 8. Encrypt the one-time key with server's public key.
+//                byte[] signedOneTimeKey = HashingAndEncryption.kemKeyWrap(serverKeys.getPublic(), oneTimeKey);
+//
+//                // 9. Combine signed one time key with signed message digest.
+//                KeyWithMessageDigest keyWithMessageDigest = new KeyWithMessageDigest(signedOneTimeKey, signedMessageDigest);
 
                 // 9. Send to server.
-                bufferedWriter.write(name + ": " + keyWithMessageDigest);
+//                bufferedWriter.write(name + ": " + keyWithMessageDigest);
+                bufferedWriter.write(name + ": " + messageToSend);
 
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
             }
-        } catch (IOException | GeneralSecurityException e) {
+        } catch (IOException e) {
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
