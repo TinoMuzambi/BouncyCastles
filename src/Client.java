@@ -32,7 +32,7 @@ public class Client {
 
     public void sendMessage() {
         try {
-            bufferedWriter.write(name);
+            bufferedWriter.write(name + " - " + publicKey.toString());
 
             bufferedWriter.newLine();
             bufferedWriter.flush();
@@ -40,7 +40,7 @@ public class Client {
             Scanner scanner = new Scanner(System.in);
             while (socket.isConnected()) {
                 String messageToSend = scanner.nextLine();
-                bufferedWriter.write(name + ":" + messageToSend);
+                bufferedWriter.write(name + ": " + messageToSend);
 
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
