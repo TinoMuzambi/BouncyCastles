@@ -101,8 +101,8 @@ public class ClientHandler implements Runnable{
     public void removeClientHandler(){
         clientHandlers.remove(this);
         broadcastMessage("SERVER: " + name + " has left the chat!");
-
     }
+
     public void closeEverything(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter){
         removeClientHandler();
         try {
@@ -118,6 +118,5 @@ public class ClientHandler implements Runnable{
         } catch (IOException e){
             e.printStackTrace();
         }
-
     }
 }

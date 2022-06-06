@@ -184,5 +184,4 @@ public class Client {
         } catch (Exception ignored) {
         }
     }
-
 }
