@@ -3,7 +3,9 @@ import java.io.*;
 import java.net.Socket;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAKeyGenParameterSpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Scanner;
 
@@ -25,11 +27,8 @@ public class Client {
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.name = name;
             this.message = message;
-            KeyPair pair = Hashing.generateKeyPair();
-            PublicKey UK = pair.getPublic();
-            PrivateKey RK = pair.getPrivate();
-            init(UK, RK);
-//            this.bufferedWriter.write(name + " - " + Arrays.toString(publicKey.getEncoded()));
+            generateKeyPair();
+            this.bufferedWriter.write(name + " - " + Arrays.toString(publicKey.getEncoded()));
         } catch (IOException e){
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
@@ -98,6 +97,29 @@ public class Client {
         }
     }
 
+    public void generateKeyPair() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Hashing.installProvider();
+                KeyPairGenerator keyPairGenerator = null;
+                try {
+                    keyPairGenerator = KeyPairGenerator.getInstance("RSA", "BCFIPS");
+                } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    keyPairGenerator.initialize(new RSAKeyGenParameterSpec(3072, RSAKeyGenParameterSpec.F4));
+                } catch (InvalidAlgorithmParameterException e) {
+                    throw new RuntimeException(e);
+                }
+                KeyPair pair = keyPairGenerator.generateKeyPair();
+                privateKey = pair.getPrivate();
+                publicKey = pair.getPublic();
+            }
+        }).start();
+    }
+
     public void listenForMessage(){
         new Thread(new Runnable() {
             @Override
@@ -132,12 +154,8 @@ public class Client {
 
 
     }
-    public static void main(String[] args) throws IOException {
-
-
+    public static void main(String[] args) {
         try {
-
-
             Scanner scanner = new Scanner(System.in);
 
             System.out.println("Enter your name");
