@@ -27,8 +27,8 @@ public class Client {
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.name = name;
             this.message = message;
-            generateKeyPair();
-            this.bufferedWriter.write(name + " - " + Arrays.toString(publicKey.getEncoded()));
+//            generateKeyPair();
+//            this.bufferedWriter.write(name + " - " + Arrays.toString(publicKey.getEncoded()));
         } catch (IOException e){
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
@@ -39,21 +39,21 @@ public class Client {
             publicKey = UK;
     }
 
-//    public void initFromStrings(){
-//        try{
-//            X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(decode(PUBLIC_KEY_STRING));
-//            PKCS8EncodedKeySpec keySpecPrivate = new PKCS8EncodedKeySpec(decode(PRIVATE_KEY_STRING));
-//
-//            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-//
-//            publicKey = keyFactory.generatePublic(keySpecPublic);
-//            privateKey = keyFactory.generatePrivate(keySpecPrivate);
-//
-//
-//        }catch (Exception ignored){}
-//
-//
-//    }
+    public void initFromStrings(byte[] publicKeyString, byte[] privateKeyString){
+        try{
+            X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(publicKeyString);
+            PKCS8EncodedKeySpec keySpecPrivate = new PKCS8EncodedKeySpec(privateKeyString);
+
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+
+            publicKey = keyFactory.generatePublic(keySpecPublic);
+            privateKey = keyFactory.generatePrivate(keySpecPrivate);
+
+
+        }catch (Exception ignored){}
+
+
+    }
 
     public void setPrivateKey(){
         System.err.println("Public key\n"+ encode(publicKey.getEncoded()));
@@ -158,6 +158,8 @@ public class Client {
         try {
             Scanner scanner = new Scanner(System.in);
 
+            System.out.println(args[0]);
+            System.out.println(args[1]);
             System.out.println("Enter your name");
             String name = scanner.nextLine();
 
@@ -167,6 +169,7 @@ public class Client {
             Socket socket = new Socket("localhost", 1235);
 
             Client client = new Client(socket, name, message);
+            client.initFromStrings(args[0].getBytes(), args[1].getBytes());
 
             String encryptedMessage = client.encrypt(message);
             String descruptedMessage = client.decrypt(encryptedMessage);
