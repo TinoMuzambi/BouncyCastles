@@ -34,10 +34,6 @@ public class Client {
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
-    public Client() throws GeneralSecurityException {
-
-
-    }
 
     public void init(PublicKey UK, PrivateKey RK){
             privateKey = RK;
