@@ -39,7 +39,7 @@ public class Client {
             publicKey = UK;
     }
 
-    public void initFromStrings(String publicKeyBytes, String privateKeyBytes){
+    public void initFromStrings(String privateKeyBytes, String publicKeyBytes){
         try{
             X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(decode(publicKeyBytes));
             PKCS8EncodedKeySpec keySpecPrivate = new PKCS8EncodedKeySpec(decode(privateKeyBytes));
