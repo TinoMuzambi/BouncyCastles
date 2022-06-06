@@ -66,7 +66,7 @@ public class Client {
 
     public void sendMessage(){
         try {
-            bufferedWriter.write(name);
+            bufferedWriter.write(name + " - " + Base64.getEncoder().encodeToString(publicKey.getEncoded()));
             bufferedWriter.newLine();
             bufferedWriter.flush();
 
