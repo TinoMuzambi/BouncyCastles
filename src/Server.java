@@ -5,7 +5,8 @@ import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 
 public class Server {
-    private final ServerSocket serverSocket;
+
+    private ServerSocket serverSocket;
     KeyPair pair = Hashing.generateKeyPair();
     private final PrivateKey privateKey = pair.getPrivate();
     private final PublicKey publicKey = pair.getPublic();
@@ -14,18 +15,26 @@ public class Server {
         this.serverSocket = serverSocket;
     }
 
-    public void startServer(){
-        try{
-            while (!serverSocket.isClosed()) {
-                System.err.println("SERVER STARTED");
-                Socket socket = serverSocket.accept();
-                System.out.println("Connection established!");
-                ClientHandler clientHandler = new ClientHandler(socket, publicKey);
+    public void startServer() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+        System.err.println("SERVER STARTED");
 
-                Thread thread = new Thread(clientHandler);
-                thread.start();
+        while (!serverSocket.isClosed()) {
+            Socket socket = serverSocket.accept();
+            System.out.println("Connection established!");
+            ClientHandler clientHandler = new ClientHandler(socket, publicKey);
+
+            Thread thread = new Thread(clientHandler);
+            thread.start();
+        }
+    }
+
+    public void closeServerSocket() {
+        try {
+            if (serverSocket != null) {
+                serverSocket.close();
             }
-        } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException ignored){
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -34,6 +43,7 @@ public class Server {
         ServerSocket serverSocket = new ServerSocket(1235);
         Server server = new Server(serverSocket);
         server.startServer();
+
     }
 }
 
