@@ -45,7 +45,7 @@ public class Client {
         }
     }
 
-    //    private String encode(byte[] data){ return Base64.getEncoder().encodeToString(data); }
+        private String encode(byte[] data){ return Base64.getEncoder().encodeToString(data); }
 
     private byte[] decode(String data) {
         return Base64.getDecoder().decode(data);
@@ -79,20 +79,24 @@ public class Client {
                 SecretKey oneTimeKey = Encryption.generateKey();
 
                 // 7. Encrypt messages with one time key.
-                byte[][] signedMessageEncrypted = Encryption.cbcEncrypt(oneTimeKey, signedMessage);
-                byte[][] messageToSendBytesEncrypted = Encryption.cbcEncrypt(oneTimeKey, messageToSendBytes);
+                byte[][] signedMessageEncryptedRes = Encryption.cbcEncrypt(oneTimeKey, signedMessage);
+                byte[] signedMessageEncryptedIV = signedMessageEncryptedRes[0];
+                byte[] signedMessageEncrypted = signedMessageEncryptedRes[1];
+                byte[][] messageToSendBytesEncryptedRes = Encryption.cbcEncrypt(oneTimeKey, messageToSendBytes);
+                byte[] messageToSendBytesEncryptedIV = messageToSendBytesEncryptedRes[0];
+                byte[] messageToSendBytesEncrypted = messageToSendBytesEncryptedRes[1];
 
                 // 5. Combine signed message with the original message.
-                byte[][][] signedMessageDigest = {signedMessageEncrypted, messageToSendBytesEncrypted};
+//                byte[][][] signedMessageDigest = {signedMessageEncrypted, messageToSendBytesEncrypted};
 
                 // 8. Encrypt the one-time key with server's public key.
                 byte[] signedOneTimeKey = HashingAndEncryption.kemKeyWrap(serverPublicKey, oneTimeKey);
 
                 // 9. Combine signed one time key with signed message digest.
-                KeyWithMessageDigest keyWithMessageDigest = new KeyWithMessageDigest(signedOneTimeKey, signedMessageDigest);
+//                KeyWithMessageDigest keyWithMessageDigest = new KeyWithMessageDigest(signedOneTimeKey, signedMessageDigest);
 
-                // 9. Send to server.
-                bufferedWriter.write(name + ": " + keyWithMessageDigest);
+                // 5.9. Send to server.
+                bufferedWriter.write(name + ": " + encode(signedOneTimeKey) + " - " + encode(signedMessageEncryptedIV) + " - " + encode(signedMessageEncrypted) + " - " + encode(messageToSendBytesEncryptedIV) + " - " + encode(messageToSendBytesEncrypted));
 
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
