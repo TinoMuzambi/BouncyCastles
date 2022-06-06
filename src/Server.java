@@ -6,7 +6,7 @@ import java.security.spec.InvalidKeySpecException;
 
 public class Server {
 
-    private ServerSocket serverSocket;
+    private final ServerSocket serverSocket;
     KeyPair pair = Hashing.generateKeyPair();
     private final PrivateKey privateKey = pair.getPrivate();
     private final PublicKey publicKey = pair.getPublic();
@@ -28,15 +28,15 @@ public class Server {
         }
     }
 
-    public void closeServerSocket() {
-        try {
-            if (serverSocket != null) {
-                serverSocket.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void closeServerSocket() {
+//        try {
+//            if (serverSocket != null) {
+//                serverSocket.close();
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public static void main(String[] args) throws IOException, GeneralSecurityException {
         Hashing.installProvider();
