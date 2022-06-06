@@ -7,6 +7,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.logging.SocketHandler;
 
@@ -35,6 +36,7 @@ public class ClientHandler implements Runnable{
 
             clientHandlers.add(this);
             broadcastMessage("SERVER: " + name + " has joined the group chat");
+            broadcastUK();
         } catch (IOException e){
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
@@ -70,6 +72,21 @@ public class ClientHandler implements Runnable{
             }
         }
     }
+
+    public void broadcastUK(){
+        for (ClientHandler clientHandler : clientHandlers){
+            try{
+                if (clientHandler.name.equals(name)) {
+                    clientHandler.bufferedWriter.write("UK:SERVER: " + Base64.getEncoder().encodeToString(serverPublicKey.getEncoded()));
+                    clientHandler.bufferedWriter.newLine();
+                    clientHandler.bufferedWriter.flush();
+                }
+            } catch (IOException e){
+                closeEverything(socket, bufferedReader, bufferedWriter);
+            }
+        }
+    }
+
     public void removeClientHandler(){
         clientHandlers.remove(this);
         broadcastMessage("SERVER: " + name + " has left the chat!");

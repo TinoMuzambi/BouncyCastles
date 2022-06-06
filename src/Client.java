@@ -5,6 +5,7 @@ import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -21,6 +22,7 @@ public class Client {
     private String message;
     private PrivateKey privateKey;
     private PublicKey publicKey;
+    private PublicKey serverPublicKey;
 
 
     public Client(Socket socket, String name, String message) throws GeneralSecurityException {
@@ -80,38 +82,39 @@ public class Client {
             while (socket.isConnected()) {
                 String messageToSend = scanner.nextLine();
 
-                byte[] messageToSendBytes = Strings.toByteArray(messageToSend);
-
-                // 3. Compress message.
-                byte[] messageToSendBytesCompressed = Hashing.compressData(messageToSendBytes);
-
-                // 3. Hash compressed message.
-                byte[] messageToSendBytesCompressedHashed = Hashing.calculateSha3Digest(messageToSendBytesCompressed);
-
-                // 4. Sign message with private key.
-                byte[] signedMessage = Hashing.generatePkcs1Signature(privateKey, messageToSendBytesCompressedHashed);
-
-                // 6. Initialise and generate one-time secret key.
-                Encryption.defineKey(new byte[128 / 8]);
-                Encryption.defineKey(new byte[192 / 8]);
-                Encryption.defineKey(new byte[256 / 8]);
-                SecretKey oneTimeKey = Encryption.generateKey();
-
-                // 7. Encrypt messages with one time key.
-                byte[][] signedMessageEncrypted = Encryption.cbcEncrypt(oneTimeKey, signedMessage);
-                byte[][] messageToSendBytesEncrypted = Encryption.cbcEncrypt(oneTimeKey, messageToSendBytes);
-
-                // 5. Combine signed message with the original message.
-                byte[][][] signedMessageDigest = {signedMessageEncrypted, messageToSendBytesEncrypted};
-
-                // 8. Encrypt the one-time key with server's public key.
-                byte[] signedOneTimeKey = HashingAndEncryption.kemKeyWrap(serverKeys.getPublic(), oneTimeKey);
-
-                // 9. Combine signed one time key with signed message digest.
-                KeyWithMessageDigest keyWithMessageDigest = new KeyWithMessageDigest(signedOneTimeKey, signedMessageDigest);
-
-                // 9. Send to server.
-                bufferedWriter.write(name + ": " + keyWithMessageDigest);
+//                byte[] messageToSendBytes = Strings.toByteArray(messageToSend);
+//
+//                // 3. Compress message.
+//                byte[] messageToSendBytesCompressed = Hashing.compressData(messageToSendBytes);
+//
+//                // 3. Hash compressed message.
+//                byte[] messageToSendBytesCompressedHashed = Hashing.calculateSha3Digest(messageToSendBytesCompressed);
+//
+//                // 4. Sign message with private key.
+//                byte[] signedMessage = Hashing.generatePkcs1Signature(privateKey, messageToSendBytesCompressedHashed);
+//
+//                // 6. Initialise and generate one-time secret key.
+//                Encryption.defineKey(new byte[128 / 8]);
+//                Encryption.defineKey(new byte[192 / 8]);
+//                Encryption.defineKey(new byte[256 / 8]);
+//                SecretKey oneTimeKey = Encryption.generateKey();
+//
+//                // 7. Encrypt messages with one time key.
+//                byte[][] signedMessageEncrypted = Encryption.cbcEncrypt(oneTimeKey, signedMessage);
+//                byte[][] messageToSendBytesEncrypted = Encryption.cbcEncrypt(oneTimeKey, messageToSendBytes);
+//
+//                // 5. Combine signed message with the original message.
+//                byte[][][] signedMessageDigest = {signedMessageEncrypted, messageToSendBytesEncrypted};
+//
+//                // 8. Encrypt the one-time key with server's public key.
+//                byte[] signedOneTimeKey = HashingAndEncryption.kemKeyWrap(serverKeys.getPublic(), oneTimeKey);
+//
+//                // 9. Combine signed one time key with signed message digest.
+//                KeyWithMessageDigest keyWithMessageDigest = new KeyWithMessageDigest(signedOneTimeKey, signedMessageDigest);
+//
+//                // 9. Send to server.
+//                bufferedWriter.write(name + ": " + keyWithMessageDigest);
+                bufferedWriter.write(name + ": " + messageToSend);
 
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
@@ -130,8 +133,14 @@ public class Client {
                 while (socket.isConnected()) {
                     try {
                         msgFromGroupChat = bufferedReader.readLine();
-                        System.out.println(msgFromGroupChat);
-                    } catch (IOException e) {
+                        if (!msgFromGroupChat.contains("UK:SERVER")) {
+                            System.out.println(msgFromGroupChat);
+                        } else {
+                            X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(decode(msgFromGroupChat.substring(11)));
+                            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                            serverPublicKey = keyFactory.generatePublic(keySpecPublic);
+                        }
+                    } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
                         closeEverything(socket, bufferedReader, bufferedWriter);
                     }
                 }
