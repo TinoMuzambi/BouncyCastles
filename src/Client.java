@@ -3,8 +3,8 @@ import org.bouncycastle.util.Strings;
 import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -86,18 +86,11 @@ public class Client {
                 byte[] messageToSendBytesEncryptedIV = messageToSendBytesEncryptedRes[0];
                 byte[] messageToSendBytesEncrypted = messageToSendBytesEncryptedRes[1];
 
-                // 5. Combine signed message with the original message.
-//                byte[][][] signedMessageDigest = {signedMessageEncrypted, messageToSendBytesEncrypted};
-
                 // 8. Encrypt the one-time key with server's public key.
                 byte[] signedOneTimeKey = HashingAndEncryption.kemKeyWrap(serverPublicKey, oneTimeKey);
 
-                // 9. Combine signed one time key with signed message digest.
-//                KeyWithMessageDigest keyWithMessageDigest = new KeyWithMessageDigest(signedOneTimeKey, signedMessageDigest);
-
-                // 5./9. Send to server.
+                // 5./9. Combine signed one time key with signed message digest and send to server.
                 bufferedWriter.write(name + ": " + encode(signedOneTimeKey) + " - " + encode(signedMessageEncryptedIV) + " - " + encode(signedMessageEncrypted) + " - " + encode(messageToSendBytesEncryptedIV) + " - " + encode(messageToSendBytesEncrypted));
-
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
             }
@@ -130,10 +123,20 @@ public class Client {
                         byte[] signedMessageDecrypted = Encryption.cbcDecrypt(oneTimeKey, signedMessageEncryptedIV, signedMessageEncrypted);
                         byte[] messageDecrypted = Encryption.cbcDecrypt(oneTimeKey, messageBytesEncryptedIV, messageBytesEncrypted);
 
+                        // 16. Compress message portion.
+                        byte[] messageCompressed = Hashing.compressData(messageDecrypted);
 
+                        // 16. Hash compressed message.
+                        byte[] messageHashed = Hashing.calculateSha3Digest(messageCompressed);
+
+                        // 15./17. Verify message with public key.
+                        boolean messageHashMatch = Hashing.verifyPkcs1Signature(publicKey, messageHashed, signedMessageDecrypted);
+                        if (messageHashMatch) {
+                            System.out.println("Verified");
+                        }
 
                         if (!msgFromGroupChat.contains("UK:SERVER")) {
-                            System.out.println(msgFromGroupChat);
+                            System.out.println(rawData[0] + ": " + new String(messageDecrypted, StandardCharsets.UTF_8));
                         } else {
                             X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(decode(msgFromGroupChat.substring(11)));
                             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
