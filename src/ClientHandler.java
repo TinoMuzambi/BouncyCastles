@@ -60,6 +60,8 @@ public class ClientHandler implements Runnable{
 
                 // 12.1.  Encrypt the decrypted one-time key with receiver's public key.
                 byte[] signedReceiverOneTimeKey = HashingAndEncryption.kemKeyWrap(publicKey, decryptedOneTimeKey);
+
+                // 12.2 Send key with message digest to receiver.
                 broadcastMessage(rawData[0] + ": " + encode(signedReceiverOneTimeKey) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
             } catch (IOException | GeneralSecurityException e) {
                 closeEverything(socket, bufferedReader, bufferedWriter);
