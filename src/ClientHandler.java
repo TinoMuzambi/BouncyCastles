@@ -1,7 +1,9 @@
+import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
@@ -17,8 +19,9 @@ public class ClientHandler implements Runnable{
     private String name;
     private PublicKey publicKey;
     private PublicKey serverPublicKey;
+    private PrivateKey serverPrivateKey;
 
-    public ClientHandler(Socket socket, PublicKey serverPublicKey) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public ClientHandler(Socket socket, PublicKey serverPublicKey, PrivateKey serverPrivateKey) throws NoSuchAlgorithmException, InvalidKeySpecException {
         try {
             this.socket = socket;
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -30,6 +33,7 @@ public class ClientHandler implements Runnable{
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             this.publicKey = keyFactory.generatePublic(keySpecPublic);
             this.serverPublicKey = serverPublicKey;
+            this.serverPrivateKey = serverPrivateKey;
 
             clientHandlers.add(this);
             broadcastMessage("SERVER: " + name + " has joined the group chat");
@@ -48,6 +52,11 @@ public class ClientHandler implements Runnable{
         while (socket.isConnected()){
             try {
                 messageFromClient = bufferedReader.readLine();
+                String[] data = messageFromClient.split(": ");
+
+                // 10. Decrypt one time key with server's private key.
+                byte[] signedOneTimeKey = decode(data[1]);
+                SecretKey decryptedOneTimeKey = HashingAndEncryption.kemKeyUnwrap()
                 broadcastMessage(messageFromClient);
             } catch (IOException e) {
                 closeEverything(socket, bufferedReader, bufferedWriter);
