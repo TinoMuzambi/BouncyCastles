@@ -27,16 +27,10 @@ public class Client {
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.name = name;
             this.message = message;
-//            generateKeyPair();
 //            this.bufferedWriter.write(name + " - " + Arrays.toString(publicKey.getEncoded()));
         } catch (IOException e){
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
-    }
-
-    public void init(PublicKey UK, PrivateKey RK){
-            privateKey = RK;
-            publicKey = UK;
     }
 
     public void initFromStrings(String privateKeyBytes, String publicKeyBytes){
@@ -48,36 +42,26 @@ public class Client {
 
             publicKey = keyFactory.generatePublic(keySpecPublic);
             privateKey = keyFactory.generatePrivate(keySpecPrivate);
-            System.out.println(publicKey);
-            System.out.println(privateKey);
-
-        }catch (Exception ignored){}
-
-
+        } catch (Exception ignored){}
     }
 
-    public void setPrivateKey(){
-        System.err.println("Public key\n"+ encode(publicKey.getEncoded()));
-        System.err.println("Private key\n"+ encode(privateKey.getEncoded()));
-    }
+//    public String encrypt(String message) throws Exception{
+//        byte[] messageToBytes = message.getBytes();
+//        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+//        cipher.init(Cipher.ENCRYPT_MODE,publicKey);
+//        byte[] encryptedBytes = cipher.doFinal(messageToBytes);
+//        return encode(encryptedBytes);
+//    }
 
-    public String encrypt(String message) throws Exception{
-        byte[] messageToBytes = message.getBytes();
-        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        cipher.init(Cipher.ENCRYPT_MODE,publicKey);
-        byte[] encryptedBytes = cipher.doFinal(messageToBytes);
-        return encode(encryptedBytes);
-    }
-
-    private String encode(byte[] data){ return Base64.getEncoder().encodeToString(data); }
-    public String decrypt(String encryptedMessage) throws Exception{
-        byte[] encryptedBytes = decode(encryptedMessage);
-        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        byte[] decryptedMessage = cipher.doFinal(encryptedBytes);
-        return new String(decryptedMessage, "UTF8");
-
-    }
+//    private String encode(byte[] data){ return Base64.getEncoder().encodeToString(data); }
+//    public String decrypt(String encryptedMessage) throws Exception{
+//        byte[] encryptedBytes = decode(encryptedMessage);
+//        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+//        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+//        byte[] decryptedMessage = cipher.doFinal(encryptedBytes);
+//        return new String(decryptedMessage, "UTF8");
+//
+//    }
     private byte[] decode(String data){return Base64.getDecoder().decode(data);}
 
     public void sendMessage(){
@@ -96,29 +80,6 @@ public class Client {
         } catch (IOException e){
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
-    }
-
-    public void generateKeyPair() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Hashing.installProvider();
-                KeyPairGenerator keyPairGenerator = null;
-                try {
-                    keyPairGenerator = KeyPairGenerator.getInstance("RSA", "BCFIPS");
-                } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-                    throw new RuntimeException(e);
-                }
-                try {
-                    keyPairGenerator.initialize(new RSAKeyGenParameterSpec(3072, RSAKeyGenParameterSpec.F4));
-                } catch (InvalidAlgorithmParameterException e) {
-                    throw new RuntimeException(e);
-                }
-                KeyPair pair = keyPairGenerator.generateKeyPair();
-                privateKey = pair.getPrivate();
-                publicKey = pair.getPublic();
-            }
-        }).start();
     }
 
     public void listenForMessage(){
@@ -152,15 +113,11 @@ public class Client {
         } catch (IOException e){
             e.printStackTrace();
         }
-
-
     }
     public static void main(String[] args) {
         try {
             Scanner scanner = new Scanner(System.in);
 
-            System.out.println(args[0]);
-            System.out.println(args[1]);
             System.out.println("Enter your name");
             String name = scanner.nextLine();
 
@@ -172,11 +129,11 @@ public class Client {
             Client client = new Client(socket, name, message);
             client.initFromStrings(args[0], args[1]);
 
-            String encryptedMessage = client.encrypt(message);
-            String descruptedMessage = client.decrypt(encryptedMessage);
-
-            System.err.println("Encrypted:\n"+encryptedMessage);
-            System.err.println("Decrypted:\n"+descruptedMessage);
+//            String encryptedMessage = client.encrypt(message);
+//            String decryptedMessage = client.decrypt(encryptedMessage);
+//
+//            System.err.println("Encrypted:\n"+encryptedMessage);
+//            System.err.println("Decrypted:\n"+decryptedMessage);
 
             client.listenForMessage();
             client.sendMessage();
