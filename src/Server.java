@@ -1,10 +1,8 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.security.GeneralSecurityException;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 
 public class Server {
 
@@ -17,7 +15,7 @@ public class Server {
         this.serverSocket = serverSocket;
     }
 
-    public void startServer() throws IOException {
+    public void startServer() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         System.err.println("SERVER STARTED");
 
         while (!serverSocket.isClosed()) {
