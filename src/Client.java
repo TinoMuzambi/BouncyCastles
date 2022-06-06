@@ -1,4 +1,7 @@
+import org.bouncycastle.util.Strings;
+
 import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
 import java.security.*;
@@ -28,13 +31,13 @@ public class Client {
             this.name = name;
             this.message = message;
 //            this.bufferedWriter.write(name + " - " + Arrays.toString(publicKey.getEncoded()));
-        } catch (IOException e){
+        } catch (IOException e) {
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
 
-    public void initFromStrings(String privateKeyBytes, String publicKeyBytes){
-        try{
+    public void initFromStrings(String privateKeyBytes, String publicKeyBytes) {
+        try {
             X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(decode(publicKeyBytes));
             PKCS8EncodedKeySpec keySpecPrivate = new PKCS8EncodedKeySpec(decode(privateKeyBytes));
 
@@ -42,7 +45,8 @@ public class Client {
 
             publicKey = keyFactory.generatePublic(keySpecPublic);
             privateKey = keyFactory.generatePrivate(keySpecPrivate);
-        } catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
 
 //    public String encrypt(String message) throws Exception{
@@ -53,7 +57,7 @@ public class Client {
 //        return encode(encryptedBytes);
 //    }
 
-//    private String encode(byte[] data){ return Base64.getEncoder().encodeToString(data); }
+    //    private String encode(byte[] data){ return Base64.getEncoder().encodeToString(data); }
 //    public String decrypt(String encryptedMessage) throws Exception{
 //        byte[] encryptedBytes = decode(encryptedMessage);
 //        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -62,58 +66,95 @@ public class Client {
 //        return new String(decryptedMessage, "UTF8");
 //
 //    }
-    private byte[] decode(String data){return Base64.getDecoder().decode(data);}
+    private byte[] decode(String data) {
+        return Base64.getDecoder().decode(data);
+    }
 
-    public void sendMessage(){
+    public void sendMessage() throws GeneralSecurityException {
         try {
             bufferedWriter.write(name + " - " + Base64.getEncoder().encodeToString(publicKey.getEncoded()));
             bufferedWriter.newLine();
             bufferedWriter.flush();
 
             Scanner scanner = new Scanner(System.in);
-            while (socket.isConnected()){
+            while (socket.isConnected()) {
                 String messageToSend = scanner.nextLine();
-                bufferedWriter.write(name + ":" + messageToSend);
+
+                byte[] messageToSendBytes = Strings.toByteArray(messageToSend);
+
+                // 3. Compress message.
+                byte[] messageToSendBytesCompressed = Hashing.compressData(messageToSendBytes);
+
+                // 3. Hash compressed message.
+                byte[] messageToSendBytesCompressedHashed = Hashing.calculateSha3Digest(messageToSendBytesCompressed);
+
+                // 4. Sign message with private key.
+                byte[] signedMessage = Hashing.generatePkcs1Signature(privateKey, messageToSendBytesCompressedHashed);
+
+                // 6. Initialise and generate one-time secret key.
+                Encryption.defineKey(new byte[128 / 8]);
+                Encryption.defineKey(new byte[192 / 8]);
+                Encryption.defineKey(new byte[256 / 8]);
+                SecretKey oneTimeKey = Encryption.generateKey();
+
+                // 7. Encrypt messages with one time key.
+                byte[][] signedMessageEncrypted = Encryption.cbcEncrypt(oneTimeKey, signedMessage);
+                byte[][] messageToSendBytesEncrypted = Encryption.cbcEncrypt(oneTimeKey, messageToSendBytes);
+
+                // 5. Combine signed message with the original message.
+                byte[][][] signedMessageDigest = {signedMessageEncrypted, messageToSendBytesEncrypted};
+
+                // 8. Encrypt the one-time key with server's public key.
+                byte[] signedOneTimeKey = HashingAndEncryption.kemKeyWrap(serverKeys.getPublic(), oneTimeKey);
+
+                // 9. Combine signed one time key with signed message digest.
+                KeyWithMessageDigest keyWithMessageDigest = new KeyWithMessageDigest(signedOneTimeKey, signedMessageDigest);
+
+                // 9. Send to server.
+                bufferedWriter.write(name + ": " + keyWithMessageDigest);
+
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
 
-    public void listenForMessage(){
+    public void listenForMessage() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 String msgFromGroupChat;
 
-                while (socket.isConnected()){
+                while (socket.isConnected()) {
                     try {
                         msgFromGroupChat = bufferedReader.readLine();
                         System.out.println(msgFromGroupChat);
-                    } catch (IOException e){
+                    } catch (IOException e) {
                         closeEverything(socket, bufferedReader, bufferedWriter);
                     }
                 }
             }
         }).start();
     }
+
     public void closeEverything(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter) {
         try {
-            if (bufferedReader != null){
+            if (bufferedReader != null) {
                 bufferedReader.close();
             }
-            if (bufferedWriter != null){
+            if (bufferedWriter != null) {
                 bufferedWriter.close();
             }
-            if (socket != null){
+            if (socket != null) {
                 socket.close();
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
     public static void main(String[] args) {
         try {
             Scanner scanner = new Scanner(System.in);
@@ -138,7 +179,8 @@ public class Client {
             client.listenForMessage();
             client.sendMessage();
 
-        } catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
 
 }
