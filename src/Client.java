@@ -115,6 +115,23 @@ public class Client {
                 while (socket.isConnected()) {
                     try {
                         msgFromGroupChat = bufferedReader.readLine();
+
+                        // 13. Decrypt signed one time key with receiver's private key.
+                        String[] rawData = msgFromGroupChat.split(": ");
+                        String[] data = rawData[1].split(" - ");
+                        SecretKey oneTimeKey = (SecretKey) HashingAndEncryption.kemKeyUnwrap(privateKey, decode(data[0]));
+
+                        // 14. Decrypt messages with decrypted one time key.
+                        byte[] signedMessageEncryptedIV = decode(data[1]);
+                        byte[] signedMessageEncrypted = decode(data[2]);
+                        byte[] messageBytesEncryptedIV = decode(data[3]);
+                        byte[] messageBytesEncrypted = decode(data[4]);
+
+                        byte[] signedMessageDecrypted = Encryption.cbcDecrypt(oneTimeKey, signedMessageEncryptedIV, signedMessageEncrypted);
+                        byte[] messageDecrypted = Encryption.cbcDecrypt(oneTimeKey, messageBytesEncryptedIV, messageBytesEncrypted);
+
+
+
                         if (!msgFromGroupChat.contains("UK:SERVER")) {
                             System.out.println(msgFromGroupChat);
                         } else {
@@ -122,7 +139,7 @@ public class Client {
                             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                             serverPublicKey = keyFactory.generatePublic(keySpecPublic);
                         }
-                    } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+                    } catch (IOException | GeneralSecurityException e) {
                         closeEverything(socket, bufferedReader, bufferedWriter);
                     }
                 }
