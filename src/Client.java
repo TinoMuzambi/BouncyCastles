@@ -39,16 +39,17 @@ public class Client {
             publicKey = UK;
     }
 
-    public void initFromStrings(byte[] publicKeyString, byte[] privateKeyString){
+    public void initFromStrings(String publicKeyBytes, String privateKeyBytes){
         try{
-            X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(publicKeyString);
-            PKCS8EncodedKeySpec keySpecPrivate = new PKCS8EncodedKeySpec(privateKeyString);
+            X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(decode(publicKeyBytes));
+            PKCS8EncodedKeySpec keySpecPrivate = new PKCS8EncodedKeySpec(decode(privateKeyBytes));
 
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 
             publicKey = keyFactory.generatePublic(keySpecPublic);
             privateKey = keyFactory.generatePrivate(keySpecPrivate);
-
+            System.out.println(publicKey);
+            System.out.println(privateKey);
 
         }catch (Exception ignored){}
 
@@ -169,7 +170,7 @@ public class Client {
             Socket socket = new Socket("localhost", 1235);
 
             Client client = new Client(socket, name, message);
-            client.initFromStrings(args[0].getBytes(), args[1].getBytes());
+            client.initFromStrings(args[0], args[1]);
 
             String encryptedMessage = client.encrypt(message);
             String descruptedMessage = client.decrypt(encryptedMessage);
