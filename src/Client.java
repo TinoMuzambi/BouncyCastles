@@ -45,7 +45,7 @@ public class Client {
         }
     }
 
-        private String encode(byte[] data){ return Base64.getEncoder().encodeToString(data); }
+    private String encode(byte[] data){ return Base64.getEncoder().encodeToString(data); }
 
     private byte[] decode(String data) {
         return Base64.getDecoder().decode(data);

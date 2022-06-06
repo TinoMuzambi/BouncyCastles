@@ -1,10 +1,7 @@
 import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
@@ -45,6 +42,8 @@ public class ClientHandler implements Runnable{
 
     private byte[] decode(String data){return Base64.getDecoder().decode(data);}
 
+    private String encode(byte[] data){ return Base64.getEncoder().encodeToString(data); }
+
     @Override
     public void run() {
         String messageFromClient;
@@ -52,13 +51,17 @@ public class ClientHandler implements Runnable{
         while (socket.isConnected()){
             try {
                 messageFromClient = bufferedReader.readLine();
-                String[] data = messageFromClient.split(": ");
+                String[] rawData = messageFromClient.split(": ");
+                String[] data = rawData[1].split(" - ");
 
                 // 10. Decrypt one time key with server's private key.
-                byte[] signedOneTimeKey = decode(data[1]);
-                SecretKey decryptedOneTimeKey = HashingAndEncryption.kemKeyUnwrap()
-                broadcastMessage(messageFromClient);
-            } catch (IOException e) {
+                byte[] signedOneTimeKey = decode(data[0]);
+                SecretKey decryptedOneTimeKey = (SecretKey) HashingAndEncryption.kemKeyUnwrap(serverPrivateKey, signedOneTimeKey);
+
+                // 12.1.  Encrypt the decrypted one-time key with receiver's public key.
+                byte[] signedReceiverOneTimeKey = HashingAndEncryption.kemKeyWrap(publicKey, decryptedOneTimeKey);
+                broadcastMessage(rawData[0] + ": " + encode(signedReceiverOneTimeKey) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
+            } catch (IOException | GeneralSecurityException e) {
                 closeEverything(socket, bufferedReader, bufferedWriter);
                 break;
             }
