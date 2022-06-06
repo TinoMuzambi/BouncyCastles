@@ -1,6 +1,5 @@
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
-import java.util.Arrays;
 import java.util.Base64;
 
 public class ClientRunner {
