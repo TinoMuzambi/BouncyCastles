@@ -51,6 +51,10 @@ public class Client {
         return Base64.getDecoder().decode(data);
     }
 
+    private static void logger(String name, String descriptor, String data) {
+        System.err.println("Client " + name + ": " + descriptor + " - " + data);
+    }
+
     public void sendMessage() throws GeneralSecurityException {
         try {
             bufferedWriter.write(name + " - " + Base64.getEncoder().encodeToString(publicKey.getEncoded()));
@@ -60,6 +64,7 @@ public class Client {
             Scanner scanner = new Scanner(System.in);
             while (socket.isConnected()) {
                 String messageToSend = scanner.nextLine();
+
 
                 byte[] messageToSendBytes = Strings.toByteArray(messageToSend);
 
