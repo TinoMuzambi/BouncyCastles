@@ -96,8 +96,8 @@ public class ClientHandler implements Runnable{
                         byte[] signedReceiverOneTimeKey = HashingAndEncryption.kemKeyWrap(clientHandler.publicKey, Encryption.defineKey(signedOneTimeKey));
                         logger("one time key wrapped with receiver's public key", encode(signedReceiverOneTimeKey));
 
-                        logger("message to broadcast to [" + clientHandler.name + "]", rawData[0] + ": " + encode(signedReceiverOneTimeKey) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
-                        clientHandler.bufferedWriter.write(rawData[0] + ": " + encode(signedReceiverOneTimeKey) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
+                        logger("message to broadcast to [" + clientHandler.name + "]", rawData[0] + ": " + encode(signedReceiverOneTimeKey) + " - " + data[1] + " - " + data[2] + " - " + data[3] + " - " + data[4]);
+                        clientHandler.bufferedWriter.write(rawData[0] + ": " + encode(signedReceiverOneTimeKey) + " - " + data[1] + " - " + data[2] + " - " + data[3] + " - " + data[4]);
                     }
                     clientHandler.bufferedWriter.newLine();
                     clientHandler.bufferedWriter.flush();
