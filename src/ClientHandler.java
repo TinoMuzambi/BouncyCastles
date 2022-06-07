@@ -17,7 +17,7 @@ public class ClientHandler implements Runnable{
      */
     public static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
     /**
-     * The socket that this client handler is running on.
+     * The socket that this client handler will run on.
      */
     private Socket socket;
     /**
