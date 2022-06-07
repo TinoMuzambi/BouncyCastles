@@ -15,16 +15,16 @@ public class Server {
         this.serverSocket = serverSocket;
     }
 
-    private void logger(String descriptor, String data) {
-        System.err.println("Server: " + descriptor + " - " + data);
+    private void logger(String descriptor) {
+        System.err.println("Server: " + descriptor);
     }
 
     public void startServer() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        logger("server started","");
+        logger("server started");
 
         while (!serverSocket.isClosed()) {
             Socket socket = serverSocket.accept();
-            logger("incoming new connection", " ");
+            logger("incoming new connection");
             System.out.println("Connection established!");
             ClientHandler clientHandler = new ClientHandler(socket, publicKey, privateKey);
 
