@@ -18,4 +18,10 @@ server:
 	$(JVM) -classpath ./lib/bc-fips-1.0.2.3.jar:./bin Server
 
 clean:
-	rm ./bin/*.class
+	rm -rf ./bin/*.class
+
+docs:
+	javadoc  -classpath ./lib/bc-fips-1.0.2.3.jar:./bin -d ./doc ./src/*.java
+
+cleandocs:
+	rm -rf ./docs/*
