@@ -107,7 +107,7 @@ public class Client {
                 logger("original message encrypted", encode(messageToSendBytesEncrypted));
 
                 // 8. Encrypt the one-time key with server's public key.
-                byte[] signedOneTimeKey = HashingAndEncryption.kemKeyWrap(serverPublicKey, oneTimeKey);
+                byte[] signedOneTimeKey = HashingAndEncryption.kemKeyWrap(serverPublicWrappingKey, oneTimeKey);
                 logger("one time key wrapped with server's public key", encode(signedOneTimeKey));
 
                 // 5./9. Combine signed one time key with signed message digest and send to server.

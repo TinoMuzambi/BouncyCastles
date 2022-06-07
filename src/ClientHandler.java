@@ -70,7 +70,7 @@ public class ClientHandler implements Runnable{
 
                 // 10. Decrypt one time key with server's private key.
                 byte[] signedOneTimeKey = decode(data[0]);
-                SecretKey decryptedOneTimeKey = (SecretKey) HashingAndEncryption.kemKeyUnwrap(serverPrivateKey, signedOneTimeKey);
+                SecretKey decryptedOneTimeKey = (SecretKey) HashingAndEncryption.kemKeyUnwrap(serverPrivateWrappingKey, signedOneTimeKey);
                 logger("decrypted one time key", encode(decryptedOneTimeKey.getEncoded()));
 
                 // 12.2 Send key with message digest to receiver.
