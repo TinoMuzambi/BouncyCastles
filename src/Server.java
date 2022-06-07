@@ -24,7 +24,7 @@ public class Server {
 
     /**
      * Instantiate a Server object.
-     * @param serverSocket The socket which the server runs on.
+     * @param serverSocket The socket which the server will run on.
      * @throws GeneralSecurityException Security exceptions.
      */
     public Server(ServerSocket serverSocket) throws GeneralSecurityException {
