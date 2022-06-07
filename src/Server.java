@@ -8,7 +8,6 @@ import java.security.spec.InvalidKeySpecException;
  * Represents the server in a client-server network.
  */
 public class Server {
-
     /**
      * The socket the server will run on.
      */
