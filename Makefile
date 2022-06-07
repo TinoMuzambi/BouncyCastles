@@ -1,4 +1,4 @@
-JFLAGS = -g -classpath ./lib/bc-fips-1.0.2.3.jar -d ./bin -sourcepath ./src
+JFLAGS = -g -classpath ./lib/bc-fips-1.0.2.3.jar:./bin -d ./bin -sourcepath ./src
 JC = javac
 JVM= java
 FILE=
@@ -12,10 +12,10 @@ default: classes
 classes: $(CLASSES:.java=.class)
 
 client:
-	$(JVM) ClientRunner
+	$(JVM) -classpath ./lib/bc-fips-1.0.2.3.jar:./bin ClientRunner
 
 server:
-	$(JVM) Server
+	$(JVM) -classpath ./lib/bc-fips-1.0.2.3.jar:./bin Server
 
 clean:
 	rm ./bin/*.class
