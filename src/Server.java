@@ -5,7 +5,7 @@ import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 
 /**
- * Represents the server in a client-server network.
+ * This class represents the server in a client-server network.
  */
 public class Server {
     /**
