@@ -3,6 +3,9 @@ import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
 import java.security.Security;
 import java.util.Base64;
 
+/**
+ * Utils for running the client server setup.
+ */
 public class Utils {
     /**
      * Install Bouncy Castle provider.
