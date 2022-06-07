@@ -80,10 +80,8 @@ public class Encryption {
         defineKey(new byte[192 / 8]);
         defineKey(new byte[256 / 8]);
         SecretKey secretKey = generateKey();
-
         System.out.println("Secret key - " + secretKey.toString());
 
-        // The below represents encryption. This provides us with message authentication.
         // Generate Bob's message.
         byte[] bobMsg = Strings.toByteArray("Houston, we have a landing");
         System.out.println("Bob's plaintext message - " + Arrays.toString(bobMsg));
