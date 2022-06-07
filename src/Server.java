@@ -20,10 +20,11 @@ public class Server {
     }
 
     public void startServer() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        System.err.println("SERVER STARTED");
+        logger("server started","");
 
         while (!serverSocket.isClosed()) {
             Socket socket = serverSocket.accept();
+            logger("incoming new connection", " ");
             System.out.println("Connection established!");
             ClientHandler clientHandler = new ClientHandler(socket, publicKey, privateKey);
 
