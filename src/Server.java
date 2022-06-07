@@ -15,6 +15,10 @@ public class Server {
         this.serverSocket = serverSocket;
     }
 
+    private void logger(String descriptor, String data) {
+        System.err.println("Server: " + descriptor + " - " + data);
+    }
+
     public void startServer() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         System.err.println("SERVER STARTED");
 
