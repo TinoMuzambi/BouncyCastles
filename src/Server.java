@@ -33,7 +33,7 @@ public class Server {
 
     /**
      * Uses System.err.println to log info.
-     * @param descriptor the tag for the log.
+     * @param descriptor The tag for the log.
      */
     private void logger(String descriptor) {
         System.err.println("Server: " + descriptor);
