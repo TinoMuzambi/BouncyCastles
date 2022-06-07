@@ -172,7 +172,7 @@ public class Client {
                         if (msgFromGroupChat.contains("SERVER: ")) {
                             System.out.println(msgFromGroupChat);
                         } else if (!msgFromGroupChat.contains("UK:SVR")) {
-                            // 13. Decrypt signed one time key with receiver's private key.
+                            // 12. Decrypt signed one time key with receiver's private key.
                             String[] rawData = msgFromGroupChat.split(": ");
                             logger("raw data", Arrays.toString(rawData));
                             String[] data = rawData[1].split(" - ");
@@ -180,7 +180,7 @@ public class Client {
                             SecretKey oneTimeKey = (SecretKey) HashingAndEncryption.kemKeyUnwrap(privateKey, Utils.decode(data[0]));
                             logger("unwrapped one time secret key", Utils.encode(oneTimeKey.getEncoded()));
 
-                            // 14. Decrypt messages with decrypted one time key.
+                            // 13. Decrypt messages with decrypted one time key.
                             byte[] signedMessageEncryptedIV = Utils.decode(data[1]);
                             logger("signed message initialisation vector", Utils.encode(signedMessageEncryptedIV));
                             byte[] signedMessageEncrypted = Utils.decode(data[2]);
@@ -195,15 +195,15 @@ public class Client {
                             byte[] messageDecrypted = Encryption.cbcDecrypt(oneTimeKey, messageBytesEncryptedIV, messageBytesEncrypted);
                             logger("original message decrypted with one time key", Utils.encode(messageDecrypted));
 
-                            // 16. Compress message portion.
+                            // 15. Compress message portion.
                             byte[] messageCompressed = Hashing.compressData(messageDecrypted);
                             logger("original message compressed", Utils.encode(messageCompressed));
 
-                            // 16. Hash compressed message.
+                            // 15. Hash compressed message.
                             byte[] messageHashed = Hashing.calculateSha3Digest(messageCompressed);
                             logger("original message compressed and hashed", Utils.encode(messageHashed));
 
-                            // 15./17. Verify message with public key.
+                            // 14./16. Verify message with public key.
                             X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(Utils.decode(data[5]));
                             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                             boolean messageHashMatch = Hashing.verifyPkcs1Signature(keyFactory.generatePublic(keySpecPublic), messageHashed, signedMessageDecrypted);

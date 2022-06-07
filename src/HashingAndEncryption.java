@@ -118,33 +118,33 @@ public class HashingAndEncryption {
         SecretKey decryptedOneTimeKey = (SecretKey) kemKeyUnwrap(serverKeys.getPrivate(), keyWithMessageDigest.getOneTimeKey());
         System.out.println("10) Decrypted one time key - " + decryptedOneTimeKey.toString());
 
-        // 12.1.  Encrypt the decrypted one-time key with receiver's public key.
+        // 11.1.  Encrypt the decrypted one-time key with receiver's public key.
         byte[] signedReceiverOneTimeKey = kemKeyWrap(bobKeys.getPublic(), decryptedOneTimeKey);
         System.out.println("12.1) Encrypted decrypted one-time key with receiver's public key - " + Arrays.toString(signedReceiverOneTimeKey));
 
-        // 12.2 Send key with message digest to receiver.
+        // 11.2 Send key with message digest to receiver.
         KeyWithMessageDigest bobKeyWithMessageDigest = new KeyWithMessageDigest(signedReceiverOneTimeKey, anneSignedMsgDigest);
         System.out.println("12.2) Bob's signed one-time key with message digest - " + bobKeyWithMessageDigest);
 
-        // 13. Decrypt signed one time key with receiver's private key.
+        // 12. Decrypt signed one time key with receiver's private key.
         SecretKey bobOneTimeKey = (SecretKey) kemKeyUnwrap(bobKeys.getPrivate(), bobKeyWithMessageDigest.getOneTimeKey());
         System.out.println("13) Bob's one time key decrypted - " + bobOneTimeKey.toString());
 
-        // 14. Decrypt messages with decrypted one time key.
+        // 13. Decrypt messages with decrypted one time key.
         byte[] anneSignedMsgDecrypted = Encryption.cbcDecrypt(bobOneTimeKey, bobKeyWithMessageDigest.getMessageDigest()[0][0], bobKeyWithMessageDigest.getMessageDigest()[0][1]);
         byte[] anneMsgDecrypted = Encryption.cbcDecrypt(bobOneTimeKey, bobKeyWithMessageDigest.getMessageDigest()[1][0], bobKeyWithMessageDigest.getMessageDigest()[1][1]);
         System.out.println("14) Anne's signed message decrypted - " + Arrays.toString(anneSignedMsgDecrypted));
         System.out.println("14) Anne's message decrypted - " + Arrays.toString(anneMsgDecrypted));
 
-        // 16. Compress message portion.
+        // 15. Compress message portion.
         byte[] anneComparisonCompressed = Hashing.compressData(anneMsgDecrypted);
         System.out.println("16) Anne's received message compressed - " + Arrays.toString(anneComparisonCompressed));
 
-        // 16. Hash compressed message.
+        // 15. Hash compressed message.
         byte[] anneComparisonHash = Hashing.calculateSha3Digest(anneComparisonCompressed);
         System.out.println("16) Anne's received message hashed - " + Arrays.toString(anneComparisonHash));
 
-        // 15./17. Verify Anne's message with Anne's public key.
+        // 14./16. Verify Anne's message with Anne's public key.
         boolean bobReceivesAnneMsg = Hashing.verifyPkcs1Signature(anneKeys.getPublic(), anneComparisonHash, anneSignedMsgDecrypted);
         System.out.println("15/17) Bob successfully verified Anne's message - " + bobReceivesAnneMsg);
 

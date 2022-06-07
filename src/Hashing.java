@@ -93,22 +93,6 @@ public class Hashing {
     }
 
     /**
-     * Decompresses data using ZIP.
-     * @param data The data you want to decompress.
-     * @return The decompressed data.
-     * @throws IOException In case of errors in compression.
-     */
-    public static byte[] decompressData(byte[] data) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        InflaterOutputStream infl = new InflaterOutputStream(out);
-        infl.write(data);
-        infl.flush();
-        infl.close();
-
-        return out.toByteArray();
-    }
-
-    /**
      * Main method for testing the hashing and signing flow.
      * @param args Command line arguments.
      * @throws IOException Input output exceptions.
@@ -148,15 +132,15 @@ public class Hashing {
 
         // Imagine message has been sent securely to Bob.
 
-        // 16. Compress message portion.
+        // 15. Compress message portion.
         byte[] anneComparisonCompressed = compressData(anneSignedMsgDigest[1]);
         System.out.println("Anne's received message compressed - " + Arrays.toString(anneComparisonCompressed));
 
-        // 16. Hash compressed message.
+        // 15. Hash compressed message.
         byte[] anneComparisonHash = calculateSha3Digest(anneComparisonCompressed);
         System.out.println("Anne's received message hashed - " + Arrays.toString(anneComparisonHash));
 
-        // 17. Verify Anne's message with Anne's public key.
+        // 16. Verify Anne's message with Anne's public key.
         boolean bobReceivesAnneMsg = verifyPkcs1Signature(anneKeys.getPublic(), anneComparisonHash, anneSignedMsgDigest[0]);
         System.out.println("Bob successfully verified Anne's message - " + bobReceivesAnneMsg);
     }

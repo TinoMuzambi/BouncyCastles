@@ -101,12 +101,12 @@ public class ClientHandler implements Runnable{
                 String[] data = rawData[1].split(" - ");
                 logger("data", Arrays.toString(data));
 
-                // 10. Decrypt one time key with server's private key.
+                // 9. Decrypt one time key with server's private key.
                 byte[] signedOneTimeKey = Utils.decode(data[0]);
                 SecretKey decryptedOneTimeKey = (SecretKey) HashingAndEncryption.kemKeyUnwrap(serverPrivateKey, signedOneTimeKey);
                 logger("decrypted one time key", Utils.encode(decryptedOneTimeKey.getEncoded()));
 
-                // 12.2 Send key with message digest to receiver.
+                // 11.2 Send key with message digest to receiver.
                 logger("message to broadcast to receiver", rawData[0] + ": " + Utils.encode(decryptedOneTimeKey.getEncoded()) + " - " + data[1] + " - " + data[2] + " - " + data[3] + " - " + data[4]);
                 broadcastMessage(rawData[0] + ": " + Utils.encode(decryptedOneTimeKey.getEncoded()) + " - " + data[1] + " - " + data[2] + " - " + data[3] + " - " + data[4]);
             } catch (IOException | GeneralSecurityException e) {
@@ -134,7 +134,7 @@ public class ClientHandler implements Runnable{
 
                         byte[] signedOneTimeKey = Utils.decode(data[0]);
 
-                        // 12.1.  Encrypt the decrypted one-time key with receiver's public key.
+                        // 11.1. Encrypt the decrypted one-time key with receiver's public key.
                         byte[] signedReceiverOneTimeKey = HashingAndEncryption.kemKeyWrap(clientHandler.publicKey, Encryption.defineKey(signedOneTimeKey));
                         logger("one time key wrapped with receiver's public key", Utils.encode(signedReceiverOneTimeKey));
 
@@ -157,6 +157,7 @@ public class ClientHandler implements Runnable{
         for (ClientHandler clientHandler : clientHandlers){
             try{
                 if (clientHandler.name.equals(name)) {
+                    // 1.2 Send Public key to client.
                     String UKString = "UK:SVR: " + Utils.encode(serverPublicKey.getEncoded());
                     logger("public key being broadcast to [" + clientHandler.name + "]", UKString);
                     clientHandler.bufferedWriter.write(UKString);
