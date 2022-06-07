@@ -54,7 +54,7 @@ public class Client {
     }
 
     private void logger(String descriptor, String data) {
-        System.err.println("Client " + name + ": " + descriptor + " - " + data);
+        System.err.println("Client [" + name + "]: " + descriptor + " - " + data);
     }
 
     public void sendMessage() throws GeneralSecurityException {

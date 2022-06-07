@@ -44,6 +44,10 @@ public class ClientHandler implements Runnable{
 
     private String encode(byte[] data){ return Base64.getEncoder().encodeToString(data); }
 
+    private void logger(String descriptor, String data) {
+        System.err.println("Client handler [" + name + "]: " + descriptor + " - " + data);
+    }
+
     @Override
     public void run() {
         String messageFromClient;
@@ -51,6 +55,7 @@ public class ClientHandler implements Runnable{
         while (socket.isConnected()){
             try {
                 messageFromClient = bufferedReader.readLine();
+
                 String[] rawData = messageFromClient.split(": ");
                 String[] data = rawData[1].split(" - ");
 
