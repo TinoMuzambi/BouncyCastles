@@ -20,6 +20,7 @@ public class Client {
     private PrivateKey privateKey;
     private PublicKey publicKey;
     private PublicKey serverPublicKey;
+    private PublicKey serverPublicWrappingKey;
 
 
     public Client(Socket socket, String name) {
@@ -175,10 +176,14 @@ public class Client {
                             logger("message received from server", rawData[0] + ": " + new String(messageDecrypted, StandardCharsets.UTF_8));
                             System.out.println(rawData[0] + ": " + new String(messageDecrypted, StandardCharsets.UTF_8));
                         } else {
-                            X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(decode(msgFromGroupChat.substring(8)));
+                            String serverPublicKeyString = msgFromGroupChat.substring(8).split(" - ")[0];
+                            String serverPublicWrappingKeyString = msgFromGroupChat.substring(8).split(" - ")[1];
+                            X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(decode(serverPublicKeyString));
                             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                             serverPublicKey = keyFactory.generatePublic(keySpecPublic);
-                            logger("public key received from server", encode(serverPublicKey.getEncoded()));
+                            keySpecPublic = new X509EncodedKeySpec(decode(serverPublicWrappingKeyString));
+                            serverPublicWrappingKey = keyFactory.generatePublic(keySpecPublic);
+                            logger("public keys received from server", encode(serverPublicKey.getEncoded()) + " - " + encode(serverPublicWrappingKey.getEncoded()));
                         }
                     } catch (IOException | GeneralSecurityException e) {
 //                        closeEverything(socket, bufferedReader, bufferedWriter);
