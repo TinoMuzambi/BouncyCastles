@@ -99,7 +99,7 @@ public class ClientHandler implements Runnable{
             try{
                 if (clientHandler.name.equals(name)) {
                     String UKString = "UK:SERVER: " + Base64.getEncoder().encodeToString(serverPublicKey.getEncoded());
-                    logger("public being broadcast to [" + clientHandler.name + "]: ", UKString);
+                    logger("public key being broadcast to [" + clientHandler.name + "]: ", UKString);
                     clientHandler.bufferedWriter.write(UKString);
                     clientHandler.bufferedWriter.newLine();
                     clientHandler.bufferedWriter.flush();
