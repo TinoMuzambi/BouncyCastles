@@ -166,7 +166,9 @@ public class Client {
                             logger("original message compressed and hashed", encode(messageHashed));
 
                             // 15./17. Verify message with public key.
-                            boolean messageHashMatch = Hashing.verifyPkcs1Signature(publicKey, messageHashed, signedMessageDecrypted);
+                            X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(decode(data[5]));
+                            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                            boolean messageHashMatch = Hashing.verifyPkcs1Signature(keyFactory.generatePublic(keySpecPublic), messageHashed, signedMessageDecrypted);
                             logger("verification of signatures", String.valueOf(messageHashMatch));
                             if (messageHashMatch) {
                                 System.out.println("Verified");
