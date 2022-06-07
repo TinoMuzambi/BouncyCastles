@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Scanner;
 
@@ -28,7 +29,7 @@ public class Client {
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.name = name;
         } catch (IOException e) {
-            closeEverything(socket, bufferedReader, bufferedWriter);
+//            closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
 
@@ -115,7 +116,7 @@ public class Client {
                 bufferedWriter.flush();
             }
         } catch (IOException e) {
-            closeEverything(socket, bufferedReader, bufferedWriter);
+//            closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
 
@@ -130,53 +131,57 @@ public class Client {
                         msgFromGroupChat = bufferedReader.readLine();
                         logger("message from group chat", msgFromGroupChat);
 
-                        // 13. Decrypt signed one time key with receiver's private key.
-                        String[] rawData = msgFromGroupChat.split(": ");
-                        String[] data = rawData[1].split(" - ");
-                        SecretKey oneTimeKey = (SecretKey) HashingAndEncryption.kemKeyUnwrap(privateKey, decode(data[0]));
-                        logger("unwrapped one time secret key", encode(oneTimeKey.getEncoded()));
+                        if (msgFromGroupChat.contains("SERVER: ")) {
+                            System.out.println(msgFromGroupChat);
+                        } else if (!msgFromGroupChat.contains("UK:SVR")) {
+                            // 13. Decrypt signed one time key with receiver's private key.
+                            String[] rawData = msgFromGroupChat.split(": ");
+                            logger("raw data", Arrays.toString(rawData));
+                            String[] data = rawData[1].split(" - ");
+                            logger("data", Arrays.toString(data));
+                            SecretKey oneTimeKey = (SecretKey) HashingAndEncryption.kemKeyUnwrap(privateKey, decode(data[0]));
+                            logger("unwrapped one time secret key", encode(oneTimeKey.getEncoded()));
 
-                        // 14. Decrypt messages with decrypted one time key.
-                        byte[] signedMessageEncryptedIV = decode(data[1]);
-                        logger("signed message initialisation vector", encode(signedMessageEncryptedIV));
-                        byte[] signedMessageEncrypted = decode(data[2]);
-                        logger("signed message encrypted", encode(signedMessageEncrypted));
-                        byte[] messageBytesEncryptedIV = decode(data[3]);
-                        logger("original message initialisation vector", encode(messageBytesEncryptedIV));
-                        byte[] messageBytesEncrypted = decode(data[4]);
-                        logger("original message encrypted", encode(messageBytesEncrypted));
+                            // 14. Decrypt messages with decrypted one time key.
+                            byte[] signedMessageEncryptedIV = decode(data[1]);
+                            logger("signed message initialisation vector", encode(signedMessageEncryptedIV));
+                            byte[] signedMessageEncrypted = decode(data[2]);
+                            logger("signed message encrypted", encode(signedMessageEncrypted));
+                            byte[] messageBytesEncryptedIV = decode(data[3]);
+                            logger("original message initialisation vector", encode(messageBytesEncryptedIV));
+                            byte[] messageBytesEncrypted = decode(data[4]);
+                            logger("original message encrypted", encode(messageBytesEncrypted));
 
-                        byte[] signedMessageDecrypted = Encryption.cbcDecrypt(oneTimeKey, signedMessageEncryptedIV, signedMessageEncrypted);
-                        logger("signed message decrypted with one time key", encode(signedMessageDecrypted));
-                        byte[] messageDecrypted = Encryption.cbcDecrypt(oneTimeKey, messageBytesEncryptedIV, messageBytesEncrypted);
-                        logger("original message decrypted with one time key", encode(messageDecrypted));
+                            byte[] signedMessageDecrypted = Encryption.cbcDecrypt(oneTimeKey, signedMessageEncryptedIV, signedMessageEncrypted);
+                            logger("signed message decrypted with one time key", encode(signedMessageDecrypted));
+                            byte[] messageDecrypted = Encryption.cbcDecrypt(oneTimeKey, messageBytesEncryptedIV, messageBytesEncrypted);
+                            logger("original message decrypted with one time key", encode(messageDecrypted));
 
-                        // 16. Compress message portion.
-                        byte[] messageCompressed = Hashing.compressData(messageDecrypted);
-                        logger("original message compressed", encode(messageCompressed));
+                            // 16. Compress message portion.
+                            byte[] messageCompressed = Hashing.compressData(messageDecrypted);
+                            logger("original message compressed", encode(messageCompressed));
 
-                        // 16. Hash compressed message.
-                        byte[] messageHashed = Hashing.calculateSha3Digest(messageCompressed);
-                        logger("original message compressed and hashed", encode(messageHashed));
+                            // 16. Hash compressed message.
+                            byte[] messageHashed = Hashing.calculateSha3Digest(messageCompressed);
+                            logger("original message compressed and hashed", encode(messageHashed));
 
-                        // 15./17. Verify message with public key.
-                        boolean messageHashMatch = Hashing.verifyPkcs1Signature(publicKey, messageHashed, signedMessageDecrypted);
-                        logger("verification of signatures", String.valueOf(messageHashMatch));
-                        if (messageHashMatch) {
-                            System.out.println("Verified");
-                        }
+                            // 15./17. Verify message with public key.
+                            boolean messageHashMatch = Hashing.verifyPkcs1Signature(publicKey, messageHashed, signedMessageDecrypted);
+                            logger("verification of signatures", String.valueOf(messageHashMatch));
+                            if (messageHashMatch) {
+                                System.out.println("Verified");
+                            }
 
-                        if (!msgFromGroupChat.contains("UK:SERVER")) {
                             logger("message received from server", rawData[0] + ": " + new String(messageDecrypted, StandardCharsets.UTF_8));
                             System.out.println(rawData[0] + ": " + new String(messageDecrypted, StandardCharsets.UTF_8));
                         } else {
-                            X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(decode(msgFromGroupChat.substring(11)));
+                            X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(decode(msgFromGroupChat.substring(8)));
                             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                             serverPublicKey = keyFactory.generatePublic(keySpecPublic);
                             logger("public key received from server", encode(serverPublicKey.getEncoded()));
                         }
                     } catch (IOException | GeneralSecurityException e) {
-                        closeEverything(socket, bufferedReader, bufferedWriter);
+//                        closeEverything(socket, bufferedReader, bufferedWriter);
                     }
                 }
             }

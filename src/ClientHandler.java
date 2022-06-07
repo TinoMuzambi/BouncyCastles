@@ -36,7 +36,7 @@ public class ClientHandler implements Runnable{
             broadcastMessage("SERVER: " + name + " has joined the group chat");
             broadcastUK();
         } catch (IOException e){
-            closeEverything(socket, bufferedReader, bufferedWriter);
+//            closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
 
@@ -65,16 +65,11 @@ public class ClientHandler implements Runnable{
                 SecretKey decryptedOneTimeKey = (SecretKey) HashingAndEncryption.kemKeyUnwrap(serverPrivateKey, signedOneTimeKey);
                 logger("decrypted one time key", encode(decryptedOneTimeKey.getEncoded()));
 
-                // 12.1.  Encrypt the decrypted one-time key with receiver's public key.
-                byte[] signedReceiverOneTimeKey = HashingAndEncryption.kemKeyWrap(publicKey, decryptedOneTimeKey);
-                logger("one time key wrapped with receiver's public key", encode(signedReceiverOneTimeKey));
-
                 // 12.2 Send key with message digest to receiver.
-                logger("message to broadcast to receiver", rawData[0] + ": " + encode(signedReceiverOneTimeKey) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
-                broadcastMessage(rawData[0] + ": " + encode(signedReceiverOneTimeKey) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
+                logger("message to broadcast to receiver", rawData[0] + ": " + encode(decryptedOneTimeKey.getEncoded()) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
+                broadcastMessage(rawData[0] + ": " + encode(decryptedOneTimeKey.getEncoded()) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
             } catch (IOException | GeneralSecurityException e) {
-                closeEverything(socket, bufferedReader, bufferedWriter);
-                break;
+//                closeEverything(socket, bufferedReader, bufferedWriter);
             }
         }
     }
@@ -83,13 +78,22 @@ public class ClientHandler implements Runnable{
         for (ClientHandler clientHandler : clientHandlers){
             try{
                 if (!clientHandler.name.equals(name)){
-                    logger("message being broadcast to [" + clientHandler.name + "]", messageToSend);
-                    clientHandler.bufferedWriter.write(messageToSend);
+                    String[] rawData = messageToSend.split(": ");
+                    String[] data = rawData[1].split(" - ");
+
+                    byte[] signedOneTimeKey = decode(data[0]);
+
+                    // 12.1.  Encrypt the decrypted one-time key with receiver's public key.
+                    byte[] signedReceiverOneTimeKey = HashingAndEncryption.kemKeyWrap(clientHandler.publicKey, Encryption.defineKey(signedOneTimeKey));
+                    logger("one time key wrapped with receiver's public key", encode(signedReceiverOneTimeKey));
+
+                    logger("message to broadcast to [" + clientHandler.name + "]", rawData[0] + ": " + encode(signedReceiverOneTimeKey) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
+                    clientHandler.bufferedWriter.write(rawData[0] + ": " + encode(signedReceiverOneTimeKey) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
                     clientHandler.bufferedWriter.newLine();
                     clientHandler.bufferedWriter.flush();
                 }
-            } catch (IOException e){
-                closeEverything(socket, bufferedReader, bufferedWriter);
+            } catch (IOException | GeneralSecurityException e){
+//                closeEverything(socket, bufferedReader, bufferedWriter);
             }
         }
     }
@@ -98,14 +102,14 @@ public class ClientHandler implements Runnable{
         for (ClientHandler clientHandler : clientHandlers){
             try{
                 if (clientHandler.name.equals(name)) {
-                    String UKString = "UK:SERVER: " + Base64.getEncoder().encodeToString(serverPublicKey.getEncoded());
+                    String UKString = "UK:SVR: " + Base64.getEncoder().encodeToString(serverPublicKey.getEncoded());
                     logger("public key being broadcast to [" + clientHandler.name + "]", UKString);
                     clientHandler.bufferedWriter.write(UKString);
                     clientHandler.bufferedWriter.newLine();
                     clientHandler.bufferedWriter.flush();
                 }
             } catch (IOException e){
-                closeEverything(socket, bufferedReader, bufferedWriter);
+//                closeEverything(socket, bufferedReader, bufferedWriter);
             }
         }
     }
