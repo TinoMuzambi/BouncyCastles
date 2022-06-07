@@ -9,6 +9,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Arrays;
 
+/**
+ * A class for testing the full flow including hashing, signing and encryption methods.
+ */
 public class HashingAndEncryption {
 
     /**
@@ -114,13 +117,6 @@ public class HashingAndEncryption {
         // 10. Decrypt one time key with server's private key.
         SecretKey decryptedOneTimeKey = (SecretKey) kemKeyUnwrap(serverKeys.getPrivate(), keyWithMessageDigest.getOneTimeKey());
         System.out.println("10) Decrypted one time key - " + decryptedOneTimeKey.toString());
-
-
-        // 11. Decrypt messages with decrypted one time key. Yeah you were capping Tumo.
-//        byte[] anneSignedMsgDecrypted = Encryption.cbcDecrypt(decryptedOneTimeKey, keyWithMessageDigest.getMessageDigest()[0][0], keyWithMessageDigest.getMessageDigest()[0][1]);
-//        byte[] anneMsgDecrypted = Encryption.cbcDecrypt(decryptedOneTimeKey, keyWithMessageDigest.getMessageDigest()[1][0], keyWithMessageDigest.getMessageDigest()[1][1]);
-//        System.out.println("11) Anne's signed message decrypted - " + Arrays.toString(anneSignedMsgDecrypted));
-//        System.out.println("11) Anne's message decrypted - " + Arrays.toString(anneMsgDecrypted));
 
         // 12.1.  Encrypt the decrypted one-time key with receiver's public key.
         byte[] signedReceiverOneTimeKey = kemKeyWrap(bobKeys.getPublic(), decryptedOneTimeKey);

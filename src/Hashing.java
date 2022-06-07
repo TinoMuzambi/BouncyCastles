@@ -1,4 +1,3 @@
-import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
 import org.bouncycastle.util.Strings;
 
 import java.io.ByteArrayOutputStream;
@@ -9,6 +8,9 @@ import java.util.Arrays;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterOutputStream;
 
+/**
+ * A class for testing the hashing and signing flow.
+ */
 public class Hashing {
     /**
      * Generates a private/public key pair using RSA and a key size of 3072.

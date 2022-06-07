@@ -5,10 +5,12 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
+/**
+ * A class for testing the encryption flow.
+ */
 public class Encryption {
     /**
      * Generates a key using AES with 256 key size.
