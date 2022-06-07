@@ -8,17 +8,51 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 
+/**
+ * This class helps the server keep track of all connected clients.
+ */
 public class ClientHandler implements Runnable{
-
+    /**
+     * A list of all the clients connected to the server.
+     */
     public static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
+    /**
+     * The socket that this client handler is running on.
+     */
     private Socket socket;
+    /**
+     * The reader used to read messages from clients.
+     */
     private BufferedReader bufferedReader;
+    /**
+     * The writer used to write messages to clients.
+     */
     private BufferedWriter bufferedWriter;
+    /**
+     * The name of the client this client handler belongs to.
+     */
     private String name;
+    /**
+     * The public key of the client this client handler belongs to.
+     */
     private PublicKey publicKey;
+    /**
+     * The server's public key.
+     */
     private PublicKey serverPublicKey;
+    /**
+     * The server's private key.
+     */
     private PrivateKey serverPrivateKey;
 
+    /**
+     * Instantiate a ClientHandler object.
+     * @param socket The socket that this client handler will run on.
+     * @param serverPublicKey The public key of the server.
+     * @param serverPrivateKey The private key of the server.
+     * @throws NoSuchAlgorithmException No such algorithm in BCFIPS.
+     * @throws InvalidKeySpecException Invalid key specification.
+     */
     public ClientHandler(Socket socket, PublicKey serverPublicKey, PrivateKey serverPrivateKey) throws NoSuchAlgorithmException, InvalidKeySpecException {
         try {
             this.socket = socket;
@@ -30,6 +64,7 @@ public class ClientHandler implements Runnable{
             X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(decode(nameWithPublicKey.split(" - ")[1]));
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             this.publicKey = keyFactory.generatePublic(keySpecPublic);
+
             this.serverPublicKey = serverPublicKey;
             this.serverPrivateKey = serverPrivateKey;
 
@@ -41,14 +76,32 @@ public class ClientHandler implements Runnable{
         }
     }
 
+    /**
+     * Decode a string message into a byte array.
+     * @param data The data to be decoded.
+     * @return The data decoded into a byte array.
+     */
     private byte[] decode(String data){return Base64.getDecoder().decode(data);}
 
+    /**
+     * Encode a byte array into a string.
+     * @param data The data to be encoded.
+     * @return The data encoded into a string.
+     */
     private String encode(byte[] data){ return Base64.getEncoder().encodeToString(data); }
 
+    /**
+     * Uses System.err.println to log info.
+     * @param descriptor The tag for the log.
+     * @param data The data to be logged.
+     */
     private void logger(String descriptor, String data) {
         System.err.println("Client handler [" + name + "]: " + descriptor + " - " + data);
     }
 
+    /**
+     * Handle receiving messages from clients.
+     */
     @Override
     public void run() {
         String messageFromClient;
@@ -77,6 +130,10 @@ public class ClientHandler implements Runnable{
         }
     }
 
+    /**
+     * Broadcast a message to all clients connected.
+     * @param messageToSend The message to be broadcasted.
+     */
     public void broadcastMessage(String messageToSend){
         for (ClientHandler clientHandler : clientHandlers){
             try{
@@ -108,6 +165,9 @@ public class ClientHandler implements Runnable{
         }
     }
 
+    /**
+     * Broadcast the server's public key to new clients.
+     */
     public void broadcastUK(){
         for (ClientHandler clientHandler : clientHandlers){
             try{
@@ -124,11 +184,20 @@ public class ClientHandler implements Runnable{
         }
     }
 
+    /**
+     * Remove a client handler when the associated client leaves the chat.
+     */
     public void removeClientHandler(){
         clientHandlers.remove(this);
         broadcastMessage("SERVER: " + name + " has left the chat!");
     }
 
+    /**
+     * Tear down the client handler.
+     * @param socket The socket the client handler was running on.
+     * @param bufferedReader The reader for the client handler.
+     * @param bufferedWriter The writer for the client handler.
+     */
     public void closeEverything(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter){
         removeClientHandler();
         try {
