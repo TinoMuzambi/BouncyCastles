@@ -59,7 +59,9 @@ public class ClientHandler implements Runnable{
                 logger("message from client", messageFromClient);
 
                 String[] rawData = messageFromClient.split(": ");
+                logger("raw data", Arrays.toString(rawData));
                 String[] data = rawData[1].split(" - ");
+                logger("data", Arrays.toString(data));
 
                 // 10. Decrypt one time key with server's private key.
                 byte[] signedOneTimeKey = decode(data[0]);
@@ -67,8 +69,8 @@ public class ClientHandler implements Runnable{
                 logger("decrypted one time key", encode(decryptedOneTimeKey.getEncoded()));
 
                 // 12.2 Send key with message digest to receiver.
-                logger("message to broadcast to receiver", rawData[0] + ": " + encode(decryptedOneTimeKey.getEncoded()) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
-                broadcastMessage(rawData[0] + ": " + encode(decryptedOneTimeKey.getEncoded()) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
+                logger("message to broadcast to receiver", rawData[0] + ": " + encode(decryptedOneTimeKey.getEncoded()) + " - " + data[1] + " - " + data[2] + " - " + data[3] + " - " + data[4]);
+                broadcastMessage(rawData[0] + ": " + encode(decryptedOneTimeKey.getEncoded()) + " - " + data[1] + " - " + data[2] + " - " + data[3] + " - " + data[4]);
             } catch (IOException | GeneralSecurityException e) {
 //                closeEverything(socket, bufferedReader, bufferedWriter);
             }
