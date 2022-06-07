@@ -82,8 +82,6 @@ public class ClientHandler implements Runnable{
                     if (messageToSend.contains("SERVER: ")) {
                         logger("message to broadcast to [" + clientHandler.name + "]", messageToSend);
                         clientHandler.bufferedWriter.write(messageToSend);
-                        clientHandler.bufferedWriter.newLine();
-                        clientHandler.bufferedWriter.flush();
                     } else {
                         String[] rawData = messageToSend.split(": ");
                         logger("raw data", Arrays.toString(rawData));
@@ -98,9 +96,9 @@ public class ClientHandler implements Runnable{
 
                         logger("message to broadcast to [" + clientHandler.name + "]", rawData[0] + ": " + encode(signedReceiverOneTimeKey) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
                         clientHandler.bufferedWriter.write(rawData[0] + ": " + encode(signedReceiverOneTimeKey) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
-                        clientHandler.bufferedWriter.newLine();
-                        clientHandler.bufferedWriter.flush();
                     }
+                    clientHandler.bufferedWriter.newLine();
+                    clientHandler.bufferedWriter.flush();
                 }
             } catch (IOException | GeneralSecurityException e){
 //                closeEverything(socket, bufferedReader, bufferedWriter);
