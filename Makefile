@@ -1,7 +1,6 @@
 JFLAGS = -g -classpath ./lib/bc-fips-1.0.2.3.jar:./bin -d ./bin -sourcepath ./src
 JC = javac
 JVM= java
-FILE=
 .SUFFIXES: .java .class
 .java.class:
 	$(JC) $(JFLAGS) $*.java
