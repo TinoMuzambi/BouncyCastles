@@ -4,6 +4,9 @@ import java.net.Socket;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 
+/**
+ * Represents the server in a client-server network.
+ */
 public class Server {
 
     private final ServerSocket serverSocket;
@@ -11,14 +14,29 @@ public class Server {
     private final PrivateKey privateKey = pair.getPrivate();
     private final PublicKey publicKey = pair.getPublic();
 
+    /**
+     * Instantiate a Server object.
+     * @param serverSocket The socket which the server runs on.
+     * @throws GeneralSecurityException Security exceptions.
+     */
     public Server(ServerSocket serverSocket) throws GeneralSecurityException {
         this.serverSocket = serverSocket;
     }
 
+    /**
+     * Uses System.err.println to log info.
+     * @param descriptor the tag for the log.
+     */
     private void logger(String descriptor) {
         System.err.println("Server: " + descriptor);
     }
 
+    /**
+     * Starts the server on the instantiated socket.
+     * @throws IOException Input output errors.
+     * @throws NoSuchAlgorithmException No such algorithm in BCFIPS.
+     * @throws InvalidKeySpecException Invalid key specification.
+     */
     public void startServer() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         logger("server started");
 
@@ -32,16 +50,6 @@ public class Server {
             thread.start();
         }
     }
-
-//    public void closeServerSocket() {
-//        try {
-//            if (serverSocket != null) {
-//                serverSocket.close();
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     public static void main(String[] args) throws IOException, GeneralSecurityException {
         Hashing.installProvider();
