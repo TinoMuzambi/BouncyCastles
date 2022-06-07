@@ -46,6 +46,7 @@ public class Hashing {
      * Verify a signature using the PKCS#1.5 Signature Format.
      * @param rsaPublic The public key to verify with.
      * @param input The data you want to verify.
+     * @param encSignature The data you're verifying against.
      * @return True if the data is valid, false otherwise.
      * @throws GeneralSecurityException in case of security errors.
      */
