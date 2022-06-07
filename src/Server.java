@@ -8,8 +8,11 @@ public class Server {
 
     private final ServerSocket serverSocket;
     KeyPair pair = Hashing.generateKeyPair();
+    KeyPair wrappingPair = Hashing.generateKeyPair();
     private final PrivateKey privateKey = pair.getPrivate();
     private final PublicKey publicKey = pair.getPublic();
+    private final PrivateKey privateWrappingKey = wrappingPair.getPrivate();
+    private final PublicKey publicWrappingKey = wrappingPair.getPublic();
 
     public Server(ServerSocket serverSocket) throws GeneralSecurityException {
         this.serverSocket = serverSocket;
@@ -26,7 +29,7 @@ public class Server {
             Socket socket = serverSocket.accept();
             logger("incoming new connection");
             System.out.println("Connection established!");
-            ClientHandler clientHandler = new ClientHandler(socket, publicKey, privateKey);
+            ClientHandler clientHandler = new ClientHandler(socket, publicKey, privateKey, publicWrappingKey, privateWrappingKey);
 
             Thread thread = new Thread(clientHandler);
             thread.start();

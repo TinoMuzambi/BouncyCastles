@@ -19,7 +19,10 @@ public class ClientHandler implements Runnable{
     private PublicKey serverPublicKey;
     private PrivateKey serverPrivateKey;
 
-    public ClientHandler(Socket socket, PublicKey serverPublicKey, PrivateKey serverPrivateKey) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    private PublicKey serverPublicWrappingKey;
+    private PrivateKey serverPrivateWrappingKey;
+
+    public ClientHandler(Socket socket, PublicKey serverPublicKey, PrivateKey serverPrivateKey, PublicKey serverPublicWrappingKey, PrivateKey serverPrivateWrappingKey) throws NoSuchAlgorithmException, InvalidKeySpecException {
         try {
             this.socket = socket;
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -32,6 +35,8 @@ public class ClientHandler implements Runnable{
             this.publicKey = keyFactory.generatePublic(keySpecPublic);
             this.serverPublicKey = serverPublicKey;
             this.serverPrivateKey = serverPrivateKey;
+            this.serverPublicWrappingKey = serverPublicWrappingKey;
+            this.serverPrivateWrappingKey = serverPrivateWrappingKey;
 
             clientHandlers.add(this);
             broadcastMessage("SERVER: " + name + " has joined the group chat");
