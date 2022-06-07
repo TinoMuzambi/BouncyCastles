@@ -83,7 +83,7 @@ public class ClientHandler implements Runnable{
         for (ClientHandler clientHandler : clientHandlers){
             try{
                 if (!clientHandler.name.equals(name)){
-                    logger("message being broadcast to [" + clientHandler.name + "]:", messageToSend);
+                    logger("message being broadcast to [" + clientHandler.name + "]", messageToSend);
                     clientHandler.bufferedWriter.write(messageToSend);
                     clientHandler.bufferedWriter.newLine();
                     clientHandler.bufferedWriter.flush();
