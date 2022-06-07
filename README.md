@@ -1,4 +1,4 @@
-# NIS Prac
+# NIS Practical
 
 This repository is the source documents for the NIS 2022 Practical. Implementing a client server communication protocol that implements end-to-end encryption using the [BouncyCastlesFips library](https://www.bouncycastle.org/fips-java/).
 
