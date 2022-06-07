@@ -59,7 +59,9 @@ public class Client {
 
     public void sendMessage() throws GeneralSecurityException {
         try {
-            bufferedWriter.write(name + " - " + Base64.getEncoder().encodeToString(publicKey.getEncoded()));
+            String UKString = name + " - " + Base64.getEncoder().encodeToString(publicKey.getEncoded());
+            logger("public key being sent to server", UKString);
+            bufferedWriter.write(UKString);
             bufferedWriter.newLine();
             bufferedWriter.flush();
 
