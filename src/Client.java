@@ -80,10 +80,19 @@ public class Client {
         }
     }
 
+    /**
+     * Uses System.err.println to log info.
+     * @param descriptor The tag for the log.
+     * @param data The data to be logged.
+     */
     private void logger(String descriptor, String data) {
         System.err.println("Client [" + name + "]: " + descriptor + " - " + data);
     }
 
+    /**
+     * Send a message to the client.
+     * @throws GeneralSecurityException Security errors.
+     */
     public void sendMessage() throws GeneralSecurityException {
         try {
             String UKString = name + " - " + Base64.getEncoder().encodeToString(publicKey.getEncoded());
@@ -146,6 +155,9 @@ public class Client {
         }
     }
 
+    /**
+     * Listen for messages from the server.
+     */
     public void listenForMessage() {
         new Thread(new Runnable() {
             @Override
@@ -216,6 +228,12 @@ public class Client {
         }).start();
     }
 
+    /**
+     * Tear down the client.
+     * @param socket The socket the client was running on.
+     * @param bufferedReader The reader for the client.
+     * @param bufferedWriter The writer for the client.
+     */
     public void closeEverything(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter) {
         try {
             if (bufferedReader != null) {
