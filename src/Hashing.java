@@ -90,7 +90,7 @@ public class Hashing {
     }
 
     /**
-     * Deompresses data using ZIP.
+     * Decompresses data using ZIP.
      * @param data The data you want to decompress.
      * @return The decompressed data.
      * @throws IOException In case of errors in compression.
