@@ -5,6 +5,7 @@ import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 
 public class ClientHandler implements Runnable{
@@ -78,19 +79,28 @@ public class ClientHandler implements Runnable{
         for (ClientHandler clientHandler : clientHandlers){
             try{
                 if (!clientHandler.name.equals(name)){
-                    String[] rawData = messageToSend.split(": ");
-                    String[] data = rawData[1].split(" - ");
+                    if (messageToSend.contains("SERVER: ")) {
+                        logger("message to broadcast to [" + clientHandler.name + "]", messageToSend);
+                        clientHandler.bufferedWriter.write(messageToSend);
+                        clientHandler.bufferedWriter.newLine();
+                        clientHandler.bufferedWriter.flush();
+                    } else {
+                        String[] rawData = messageToSend.split(": ");
+                        logger("raw data", Arrays.toString(rawData));
+                        String[] data = rawData[1].split(" - ");
+                        logger("data", Arrays.toString(data));
 
-                    byte[] signedOneTimeKey = decode(data[0]);
+                        byte[] signedOneTimeKey = decode(data[0]);
 
-                    // 12.1.  Encrypt the decrypted one-time key with receiver's public key.
-                    byte[] signedReceiverOneTimeKey = HashingAndEncryption.kemKeyWrap(clientHandler.publicKey, Encryption.defineKey(signedOneTimeKey));
-                    logger("one time key wrapped with receiver's public key", encode(signedReceiverOneTimeKey));
+                        // 12.1.  Encrypt the decrypted one-time key with receiver's public key.
+                        byte[] signedReceiverOneTimeKey = HashingAndEncryption.kemKeyWrap(clientHandler.publicKey, Encryption.defineKey(signedOneTimeKey));
+                        logger("one time key wrapped with receiver's public key", encode(signedReceiverOneTimeKey));
 
-                    logger("message to broadcast to [" + clientHandler.name + "]", rawData[0] + ": " + encode(signedReceiverOneTimeKey) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
-                    clientHandler.bufferedWriter.write(rawData[0] + ": " + encode(signedReceiverOneTimeKey) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
-                    clientHandler.bufferedWriter.newLine();
-                    clientHandler.bufferedWriter.flush();
+                        logger("message to broadcast to [" + clientHandler.name + "]", rawData[0] + ": " + encode(signedReceiverOneTimeKey) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
+                        clientHandler.bufferedWriter.write(rawData[0] + ": " + encode(signedReceiverOneTimeKey) + " - " + data[1] + " - " + data[2] + " - " + " - " + data[3] + " - " + data[4]);
+                        clientHandler.bufferedWriter.newLine();
+                        clientHandler.bufferedWriter.flush();
+                    }
                 }
             } catch (IOException | GeneralSecurityException e){
 //                closeEverything(socket, bufferedReader, bufferedWriter);
