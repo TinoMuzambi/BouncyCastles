@@ -83,7 +83,7 @@ public class ClientHandler implements Runnable{
         for (ClientHandler clientHandler : clientHandlers){
             try{
                 if (!clientHandler.name.equals(name)){
-                    logger("message being broadcast to [" + clientHandler.name + "]: ", messageToSend);
+                    logger("message being broadcast to [" + clientHandler.name + "]:", messageToSend);
                     clientHandler.bufferedWriter.write(messageToSend);
                     clientHandler.bufferedWriter.newLine();
                     clientHandler.bufferedWriter.flush();
@@ -99,7 +99,7 @@ public class ClientHandler implements Runnable{
             try{
                 if (clientHandler.name.equals(name)) {
                     String UKString = "UK:SERVER: " + Base64.getEncoder().encodeToString(serverPublicKey.getEncoded());
-                    logger("public key being broadcast to [" + clientHandler.name + "]: ", UKString);
+                    logger("public key being broadcast to [" + clientHandler.name + "]", UKString);
                     clientHandler.bufferedWriter.write(UKString);
                     clientHandler.bufferedWriter.newLine();
                     clientHandler.bufferedWriter.flush();
