@@ -9,9 +9,18 @@ import java.security.spec.InvalidKeySpecException;
  */
 public class Server {
 
+    /**
+     * The socket the server will run on.
+     */
     private final ServerSocket serverSocket;
     KeyPair pair = Hashing.generateKeyPair();
+    /**
+     * The server's private key.
+     */
     private final PrivateKey privateKey = pair.getPrivate();
+    /**
+     * The server's public key.
+     */
     private final PublicKey publicKey = pair.getPublic();
 
     /**
