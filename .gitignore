@@ -2,6 +2,7 @@
 /out/
 .idea/
 .vscode/
+bin/
 .DS_STORE
 *.class
 *
