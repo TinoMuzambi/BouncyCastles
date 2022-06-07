@@ -105,6 +105,12 @@ public class Hashing {
         return out.toByteArray();
     }
 
+    /**
+     * Main method for testing the hashing and signing flow.
+     * @param args Command line arguments.
+     * @throws IOException Input output exceptions.
+     * @throws GeneralSecurityException Security errors.
+     */
     public static void main(String[] args) throws GeneralSecurityException, IOException {
         Utils.installProvider();
 

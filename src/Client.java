@@ -250,6 +250,10 @@ public class Client {
         }
     }
 
+    /**
+     * Main method which installs the BouncyCastle provider and runs the client.
+     * @param args Command line arguments which in this case is the client's encoded key-pair.
+     */
     public static void main(String[] args) {
         try {
             Scanner scanner = new Scanner(System.in);

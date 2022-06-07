@@ -5,6 +5,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
@@ -64,6 +65,11 @@ public class Encryption {
     }
 
 
+    /**
+     * Main method for testing the encryption flow.
+     * @param args Command line arguments.
+     * @throws GeneralSecurityException Security errors.
+     */
     public static void main(String[] args) throws GeneralSecurityException {
         Utils.installProvider();
 

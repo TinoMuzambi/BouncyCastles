@@ -59,6 +59,12 @@ public class Server {
         }
     }
 
+    /**
+     * Main method which installs the BouncyCastle provider and runs the server.
+     * @param args Command line arguments.
+     * @throws IOException Input output exceptions.
+     * @throws GeneralSecurityException Security errors.
+     */
     public static void main(String[] args) throws IOException, GeneralSecurityException {
         Utils.installProvider();
         ServerSocket serverSocket = new ServerSocket(1235);

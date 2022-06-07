@@ -45,6 +45,12 @@ public class HashingAndEncryption {
         return c.unwrap(wrappedKey, "AES", Cipher.SECRET_KEY);
     }
 
+    /**
+     * Main method for testing the full flow including hashing, signing and encryption methods.
+     * @param args Command line arguments.
+     * @throws IOException Input output exceptions.
+     * @throws GeneralSecurityException Security errors.
+     */
     public static void main(String[] args) throws GeneralSecurityException, IOException {
         Utils.installProvider();
 
