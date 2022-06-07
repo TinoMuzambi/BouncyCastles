@@ -37,7 +37,7 @@ public class ClientHandler implements Runnable{
             broadcastMessage("SERVER: " + name + " has joined the group chat");
             broadcastUK();
         } catch (IOException e){
-//            closeEverything(socket, bufferedReader, bufferedWriter);
+            closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
 
@@ -72,7 +72,7 @@ public class ClientHandler implements Runnable{
                 logger("message to broadcast to receiver", rawData[0] + ": " + encode(decryptedOneTimeKey.getEncoded()) + " - " + data[1] + " - " + data[2] + " - " + data[3] + " - " + data[4]);
                 broadcastMessage(rawData[0] + ": " + encode(decryptedOneTimeKey.getEncoded()) + " - " + data[1] + " - " + data[2] + " - " + data[3] + " - " + data[4]);
             } catch (IOException | GeneralSecurityException e) {
-//                closeEverything(socket, bufferedReader, bufferedWriter);
+                closeEverything(socket, bufferedReader, bufferedWriter);
             }
         }
     }
@@ -103,7 +103,7 @@ public class ClientHandler implements Runnable{
                     clientHandler.bufferedWriter.flush();
                 }
             } catch (IOException | GeneralSecurityException e){
-//                closeEverything(socket, bufferedReader, bufferedWriter);
+                closeEverything(socket, bufferedReader, bufferedWriter);
             }
         }
     }
@@ -119,7 +119,7 @@ public class ClientHandler implements Runnable{
                     clientHandler.bufferedWriter.flush();
                 }
             } catch (IOException e){
-//                closeEverything(socket, bufferedReader, bufferedWriter);
+                closeEverything(socket, bufferedReader, bufferedWriter);
             }
         }
     }

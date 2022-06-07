@@ -29,7 +29,7 @@ public class Client {
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.name = name;
         } catch (IOException e) {
-//            closeEverything(socket, bufferedReader, bufferedWriter);
+            closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
 
@@ -116,7 +116,7 @@ public class Client {
                 bufferedWriter.flush();
             }
         } catch (IOException e) {
-//            closeEverything(socket, bufferedReader, bufferedWriter);
+            closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
 
@@ -183,7 +183,7 @@ public class Client {
                             logger("public key received from server", encode(serverPublicKey.getEncoded()));
                         }
                     } catch (IOException | GeneralSecurityException e) {
-//                        closeEverything(socket, bufferedReader, bufferedWriter);
+                        closeEverything(socket, bufferedReader, bufferedWriter);
                     }
                 }
             }
