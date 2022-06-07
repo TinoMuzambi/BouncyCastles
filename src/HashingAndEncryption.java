@@ -46,7 +46,7 @@ public class HashingAndEncryption {
     }
 
     public static void main(String[] args) throws GeneralSecurityException, IOException {
-        Hashing.installProvider();
+        Utils.installProvider();
 
         // 1.1. Initialise and generate sender/receiver keys.
         KeyPair anneKeys = Hashing.generateKeyPair();

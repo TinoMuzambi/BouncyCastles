@@ -5,7 +5,6 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
@@ -66,7 +65,7 @@ public class Encryption {
 
 
     public static void main(String[] args) throws GeneralSecurityException {
-        Hashing.installProvider();
+        Utils.installProvider();
 
         // Initialise and generate a key.
         defineKey(new byte[128 / 8]);

@@ -1,6 +1,17 @@
+import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
+
+import java.security.Security;
 import java.util.Base64;
 
 public class Utils {
+    /**
+     * Install Bouncy Castle provider.
+     */
+    public static void installProvider()
+    {
+        Security.addProvider(new BouncyCastleFipsProvider());
+    }
+
     /**
      * Decode a string message into a byte array.
      * @param data The data to be decoded.

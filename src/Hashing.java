@@ -105,17 +105,8 @@ public class Hashing {
         return out.toByteArray();
     }
 
-    /**
-     * Install Bouncy Castle provider.
-     */
-    public static void installProvider()
-    {
-//        Security.addProvider(new BouncyCastleProvider());
-        Security.addProvider(new BouncyCastleFipsProvider());
-    }
-
     public static void main(String[] args) throws GeneralSecurityException, IOException {
-        installProvider();
+        Utils.installProvider();
 
         // Initialise and generate sender/receiver keys.
         KeyPair anneKeys = generateKeyPair();
