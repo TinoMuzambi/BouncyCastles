@@ -51,7 +51,7 @@ public class Client {
         return Base64.getDecoder().decode(data);
     }
 
-    private static void logger(String name, String descriptor, String data) {
+    private void logger(String descriptor, String data) {
         System.err.println("Client " + name + ": " + descriptor + " - " + data);
     }
 
@@ -64,7 +64,7 @@ public class Client {
             Scanner scanner = new Scanner(System.in);
             while (socket.isConnected()) {
                 String messageToSend = scanner.nextLine();
-
+                logger("message to send", messageToSend);
 
                 byte[] messageToSendBytes = Strings.toByteArray(messageToSend);
 
