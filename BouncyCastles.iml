@@ -10,7 +10,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/bc-fips-1.0.2.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/bc-fips-1.0.2.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
